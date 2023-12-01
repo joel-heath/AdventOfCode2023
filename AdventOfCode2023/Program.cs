@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
 using System.Reflection;
+using TextCopy;
 
 namespace AdventOfCode2023;
 internal class Program
@@ -164,14 +165,17 @@ internal class Program
 
         Console.WriteLine(output);
 
-        string outputLocation = Path.Combine(startupPath, @$"Outputs\Day{day.Day}.txt");
+        string outputLocation = Path.Combine(startupPath, @$"Outputs\Day{day.Day}Part{part}.txt");
+
+        await ClipboardService.SetTextAsync(output);
+        Console.ForegroundColor = ConsoleColor.DarkGray;
+        Console.WriteLine(@$"The output has also been copied to the clipboard");
 
         using (var outputWriter = new StreamWriter(new FileStream(outputLocation, FileMode.Create), System.Text.Encoding.UTF8))
         {
             await outputWriter.WriteLineAsync(output);
         }
 
-        Console.ForegroundColor = ConsoleColor.DarkGray;
         Console.WriteLine(@$"The output has also been written to {outputLocation}");
 
         Console.ReadKey();
