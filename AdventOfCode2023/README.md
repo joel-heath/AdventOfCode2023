@@ -13,15 +13,15 @@ Here you can easily navigate each days code and read about how well I think I di
 
 | **Day** | **Verbosity** | **Notes** |
 |:---:|:---:|:---:|
-| [1](AdventOfCode2023/Day1.cs) | ⚫ |  |
-| [2](AdventOfCode2023/Day2.cs) | ⚫ |  |
-| [3](AdventOfCode2023/Day3.cs) | ⚫ |  |
-| [4](AdventOfCode2023/Day4.cs) | ⚫ |  |
-| [5](AdventOfCode2023/Day5.cs) | ⚫ |  |
-| [6](AdventOfCode2023/Day6.cs) | ⚫ |  |
-| [7](AdventOfCode2023/Day7.cs) | ⚫ |  |
-| [8](AdventOfCode2023/Day8.cs) | ⚫ |  |
-| [9](AdventOfCode2023/Day9.cs) | ⚫ |  |
+| [1](AdventOfCode2023/Day01.cs) | ⚫ |  |
+| [2](AdventOfCode2023/Day02.cs) | ⚫ |  |
+| [3](AdventOfCode2023/Day03.cs) | ⚫ |  |
+| [4](AdventOfCode2023/Day04.cs) | ⚫ |  |
+| [5](AdventOfCode2023/Day05.cs) | ⚫ |  |
+| [6](AdventOfCode2023/Day06.cs) | ⚫ |  |
+| [7](AdventOfCode2023/Day07.cs) | ⚫ |  |
+| [8](AdventOfCode2023/Day08.cs) | ⚫ |  |
+| [9](AdventOfCode2023/Day09.cs) | ⚫ |  |
 | [10](AdventOfCode2023/Day10.cs) | ⚫ |  |
 | [11](AdventOfCode2023/Day11.cs) | ⚫ |  |
 | [12](AdventOfCode2023/Day12.cs) | ⚫ |  |

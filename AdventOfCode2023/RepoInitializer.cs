@@ -60,15 +60,15 @@ Here you can easily navigate each days code and read about how well I think I di
 
 | **Day** | **Verbosity** | **Notes** |
 |:---:|:---:|:---:|
-| [1]({{PROJECT_NAME}}/Day1.cs) | ⚫ |  |
-| [2]({{PROJECT_NAME}}/Day2.cs) | ⚫ |  |
-| [3]({{PROJECT_NAME}}/Day3.cs) | ⚫ |  |
-| [4]({{PROJECT_NAME}}/Day4.cs) | ⚫ |  |
-| [5]({{PROJECT_NAME}}/Day5.cs) | ⚫ |  |
-| [6]({{PROJECT_NAME}}/Day6.cs) | ⚫ |  |
-| [7]({{PROJECT_NAME}}/Day7.cs) | ⚫ |  |
-| [8]({{PROJECT_NAME}}/Day8.cs) | ⚫ |  |
-| [9]({{PROJECT_NAME}}/Day9.cs) | ⚫ |  |
+| [1]({{PROJECT_NAME}}/Day01.cs) | ⚫ |  |
+| [2]({{PROJECT_NAME}}/Day02.cs) | ⚫ |  |
+| [3]({{PROJECT_NAME}}/Day03.cs) | ⚫ |  |
+| [4]({{PROJECT_NAME}}/Day04.cs) | ⚫ |  |
+| [5]({{PROJECT_NAME}}/Day05.cs) | ⚫ |  |
+| [6]({{PROJECT_NAME}}/Day06.cs) | ⚫ |  |
+| [7]({{PROJECT_NAME}}/Day07.cs) | ⚫ |  |
+| [8]({{PROJECT_NAME}}/Day08.cs) | ⚫ |  |
+| [9]({{PROJECT_NAME}}/Day09.cs) | ⚫ |  |
 | [10]({{PROJECT_NAME}}/Day10.cs) | ⚫ |  |
 | [11]({{PROJECT_NAME}}/Day11.cs) | ⚫ |  |
 | [12]({{PROJECT_NAME}}/Day12.cs) | ⚫ |  |
