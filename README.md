@@ -13,7 +13,7 @@ Here you can easily navigate each days code and read about how well I think I di
 
 | **Day** | **Verbosity** | **Notes** |
 |:---:|:---:|:---:|
-| [1](AdventOfCode2023/Day01.cs) | 🟡 | Suprisingly complicated day one, involving the english numerals for part two. I solved part two by reading the input forwards and getting the first numeral, then reading it in reverse and getting the first reversed numeral. |
+| [1](AdventOfCode2023/Day01.cs) | 🟢 | Suprisingly complicated day one, involving the English numerals that overlap for part two. Simplest solution to part two is to replace `one` with `one1one` (etc.) to preserve overlapping lines. |
 | [2](AdventOfCode2023/Day02.cs) | ⚫ |  |
 | [3](AdventOfCode2023/Day03.cs) | ⚫ |  |
 | [4](AdventOfCode2023/Day04.cs) | ⚫ |  |
