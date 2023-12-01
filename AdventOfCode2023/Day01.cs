@@ -24,49 +24,9 @@ public class Day01 : IDay
         { "two1nine\r\neightwothree\r\nabcone2threexyz\r\nxtwone3four\r\n4nineeightseven2\r\nzoneight234\r\n7pqrstsixteen", "281" }
     };
 
-    static readonly string[] nums = Enumerable.Range(0, 10).Select(a => $"{a}").Concat(Enumerable.Range(0, 10).Select(i => i switch
-    {
-        0 => "zero",
-        1 => "one",
-        2 => "two",
-        3 => "three",
-        4 => "four",
-        5 => "five",
-        6 => "six",
-        7 => "seven",
-        8 => "eight",
-        _ => "nine"
-    })).ToArray();
-
-    static int StringToNum(string input)
-        => input switch {
-            "zero" => 0,
-            "one" => 1,
-            "two" => 2,
-            "three" => 3,
-            "four" => 4,
-            "five" => 5,
-            "six" => 6,
-            "seven" => 7,
-            "eight" => 8,
-            "nine" => 9,
-            "0" => 0,
-            "1" => 1,
-            "2" => 2,
-            "3" => 3,
-            "4" => 4,
-            "5" => 5,
-            "6" => 6,
-            "7" => 7,
-            "8" => 8,
-             _  => 9
-    };
-
     public string SolvePart1(string input)
-        => $"{input.Split(Environment.NewLine).Sum(r => int.Parse($"{r.First(i => i >= '1' && i <= '9')}" + $"{r.Reverse().First(i => i >= '1' && i <= '9')}"))}";
+        => $"{input.Split(Environment.NewLine).Sum(r => int.Parse($"{r.First(i => i >= '1' && i <= '9')}" + $"{r.Last(i => i >= '1' && i <= '9')}"))}";
 
     public string SolvePart2(string input)
-        => $"{input.Split(Environment.NewLine).Sum(i =>int.Parse($"{
-            StringToNum(nums.Select(n => (i.IndexOf(n), n)).Select(e => e.Item1 < 0 ? (int.MaxValue, e.n) : e).MinBy(e => e.Item1).n)}" + $"{
-            StringToNum(nums.Select(n => (string.Concat(i.Reverse()).IndexOf(string.Concat(n.Reverse())), n)).Select(e => e.Item1 < 0 ? (int.MaxValue, e.n) : e).MinBy(e => e.Item1).n)}"))}";
+        => SolvePart1(input.Replace("zero", "zero0zero").Replace("one", "one1one").Replace("two", "two2two").Replace("three", "three3three").Replace("four", "four4four").Replace("five", "five5five").Replace("six", "six6six").Replace("seven", "seven7seven").Replace("eight", "eight8eight").Replace("nine", "nine9nine"));
 }
