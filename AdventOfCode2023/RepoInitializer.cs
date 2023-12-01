@@ -12,7 +12,7 @@ public static class RepoInitializer
             tasks[i-1] = dayWriter.WriteAsync(DayCode.Replace("{{DAY}}", $"{i}").Replace("{{DAY_2D}}", $"{i:00}"));
         }
 
-        using StreamWriter readmeWriter = new(new FileStream(Path.Join(path, $"README.md"), FileMode.Create));
+        using StreamWriter readmeWriter = new(new FileStream(Path.Join(workingDirectory.Parent!.FullName, $"README.md"), FileMode.Create));
         tasks[25] = readmeWriter.WriteAsync(Readme.Replace("{{PROJECT_NAME}}", Program.ProjectName).Replace("{{YEAR}}", Program.Year));
 
         await Task.WhenAll(tasks);

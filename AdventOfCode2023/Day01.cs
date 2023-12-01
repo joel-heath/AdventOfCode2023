@@ -1,5 +1,4 @@
 using System.Data;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace AdventOfCode2023;
 public class Day01 : IDay
