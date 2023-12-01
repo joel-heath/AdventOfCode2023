@@ -1,3 +1,6 @@
+using System.Data;
+using static System.Runtime.InteropServices.JavaScript.JSType;
+
 namespace AdventOfCode2023;
 public class Day01 : IDay
 {
@@ -22,25 +25,19 @@ public class Day01 : IDay
         { "two1nine\r\neightwothree\r\nabcone2threexyz\r\nxtwone3four\r\n4nineeightseven2\r\nzoneight234\r\n7pqrstsixteen", "281" }
     };
 
-    static string[] Split(string input, string? delimeter = null)
+    static readonly string[] nums = Enumerable.Range(0, 10).Select(a => $"{a}").Concat(Enumerable.Range(0, 10).Select(i => i switch
     {
-        delimeter ??= Environment.NewLine;
-        return input.Split(delimeter);
-    }
-
-    static string NumToString(int input)
-        => string.Concat(input.ToString().Select(i => i switch {
-            '0' => "zero",
-            '1' => "one",
-            '2' => "two",
-            '3' => "three",
-            '4' => "four",
-            '5' => "five",
-            '6' => "six",
-            '7' => "seven",
-            '8' => "eight",
-            '9' => "nine"
-    }));
+        0 => "zero",
+        1 => "one",
+        2 => "two",
+        3 => "three",
+        4 => "four",
+        5 => "five",
+        6 => "six",
+        7 => "seven",
+        8 => "eight",
+        _ => "nine"
+    })).ToArray();
 
     static int StringToNum(string input)
         => input switch {
@@ -63,63 +60,14 @@ public class Day01 : IDay
             "6" => 6,
             "7" => 7,
             "8" => 8,
-            "9" => 9,
+             _  => 9
     };
 
-
     public string SolvePart1(string input)
-    {
-        int output = 0;
-
-        string[] singleSplit = Split(input);
-
-
-        for (int i = 0; i < singleSplit.Length; i++)
-        {
-            string row = singleSplit[i];
-            var a = row.First(i => i >= '1' && i <= '9');
-            var b = row.Reverse().First(i => i >= '1' && i <= '9');
-
-            output += int.Parse($"{a}" + $"{b}");
-        }
-
-
-
-        return $"{output}";
-    }
+        => $"{input.Split(Environment.NewLine).Sum(r => int.Parse($"{r.First(i => i >= '1' && i <= '9')}" + $"{r.Reverse().First(i => i >= '1' && i <= '9')}"))}";
 
     public string SolvePart2(string input)
-    {
-        var nums = Enumerable.Range(0,10).Select(a => $"{a}").Concat(Enumerable.Range(0, 10).Select(NumToString)).ToArray();
-        var numsBack = nums.Select(i => string.Concat(i.Reverse())).ToArray();
-
-        int output = 0;
-
-        string[] singleSplit = Split(input);
-
-
-        for (int i = 0; i < singleSplit.Length; i++)
-        {
-            string item = singleSplit[i];
-            string item2 = string.Concat(item.Reverse());
-
-            var indicesMin = new (int i, string j)[nums.Length];
-            var indicesMax = new(int i, string j)[nums.Length];
-
-            for (int k = 0; k < nums.Length; k++)
-            {
-                string number = nums[k];
-                string numBack = numsBack[k];
-                indicesMin[k] = (item.IndexOf(number), number);
-                indicesMax[k] = (item2.IndexOf(numBack), number);
-            }
-
-            var a = indicesMin.Select(e => e.i < 0 ? (int.MaxValue, e.j) : e).MinBy(e => e.Item1).j;
-            var b = indicesMax.Select(e => e.i < 0 ? (int.MaxValue, e.j) : e).MinBy(e => e.Item1).j;
-
-            output += int.Parse($"{StringToNum(a)}" + $"{StringToNum(b)}");
-        }
-
-        return $"{output}";
-    }
+        => $"{input.Split(Environment.NewLine).Sum(i =>int.Parse($"{
+            StringToNum(nums.Select(n => (i.IndexOf(n), n)).Select(e => e.Item1 < 0 ? (int.MaxValue, e.n) : e).MinBy(e => e.Item1).n)}" + $"{
+            StringToNum(nums.Select(n => (string.Concat(i.Reverse()).IndexOf(string.Concat(n.Reverse())), n)).Select(e => e.Item1 < 0 ? (int.MaxValue, e.n) : e).MinBy(e => e.Item1).n)}"))}";
 }
