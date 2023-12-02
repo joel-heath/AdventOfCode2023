@@ -14,7 +14,7 @@ Here you can easily navigate each days code and read about how well I think I di
 | **Day** | **Verbosity** | **Notes** |
 |:---:|:---:|:---:|
 | [1](AdventOfCode2023/Day01.cs) | 🟢 | Suprisingly complicated day one, involving the English numerals that overlap for part two. Simplest solution to part two is to replace `one` with `one1one` (etc.) to preserve overlapping lines. |
-| [2](AdventOfCode2023/Day02.cs) | ⚫ |  |
+| [2](AdventOfCode2023/Day02.cs) | 🟢 | This one I went straight for regex, but the easier solution was splitting. I've got one-liners but they're complicated ones today, making good use of `GroupBy()` |
 | [3](AdventOfCode2023/Day03.cs) | ⚫ |  |
 | [4](AdventOfCode2023/Day04.cs) | ⚫ |  |
 | [5](AdventOfCode2023/Day05.cs) | ⚫ |  |
