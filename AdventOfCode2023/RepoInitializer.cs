@@ -18,7 +18,8 @@ public static class RepoInitializer
         await Task.WhenAll(tasks);
     }
 
-    private static readonly string DayCode = $"namespace {typeof(Program).Namespace}" + @";
+    private static readonly string DayCode = $"using static AdventOfCode{Program.Year}.Utils;" + Environment.NewLine + Environment.NewLine + $"namespace {typeof(Program).Namespace}" + @";
+
 public class Day{{DAY_2D}} : IDay
 {
     public int Day => {{DAY}};
@@ -42,8 +43,7 @@ public class Day{{DAY_2D}} : IDay
     {
         return string.Empty;
     }
-}
-";
+}";
 
     private static readonly string Readme = @"# Advent of Code {{YEAR}}
 My C# solutions to [Advent of Code {{YEAR}}](https://adventofcode.com/{{YEAR}}). Trying to one-liner as many as possible.
