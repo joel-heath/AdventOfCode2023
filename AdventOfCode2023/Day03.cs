@@ -1,158 +1,57 @@
+using System;
+
 namespace AdventOfCode2023;
 public class Day03 : IDay
 {
     public int Day => 3;
     public Dictionary<string, string> UnitTestsP1 => new()
     {
-        { "467..114..\r\n...*......\r\n..35..633.\r\n......#...\r\n617*......\r\n.....+.58.\r\n..592.....\r\n......755.\r\n...$.*....\r\n.664.598..", "4361" },
-        { "TestInput2", "ExpectedOutput2" }
+        { "467..114..\r\n...*......\r\n..35..633.\r\n......#...\r\n617*......\r\n.....+.58.\r\n..592.....\r\n......755.\r\n...$.*....\r\n.664.598..", "4361" }
     };
     public Dictionary<string, string> UnitTestsP2 => new()
     {
-        { "467..114..\r\n...*......\r\n..35..633.\r\n......#...\r\n617*......\r\n.....+.58.\r\n..592.....\r\n......755.\r\n...$.*....\r\n.664.598..", "467835" },
-        { "TestInput2", "ExpectedOutput2" }
+        { "467..114..\r\n...*......\r\n..35..633.\r\n......#...\r\n617*......\r\n.....+.58.\r\n..592.....\r\n......755.\r\n...$.*....\r\n.664.598..", "467835" }
+
     };
 
-    public static IEnumerable<char> GetAllAdjacent(string[] input, int row, int index, int length)
-    {
-        var left = index - 1;
-        if (left > 0)
-        {
-            yield return input[row][left]; // left
-            if (row > 0)
-                yield return input[row - 1][left]; // top left
-            if (row < input.Length - 1)
-                yield return input[row + 1][left]; // bottom left
-        }
+    public static IEnumerable<(int, int)> GetAllAdjacent(string[] input, int row, int index, int length)
+        => Enumerable.Range(0, length).Select(i => (row - 1, index + i)).Concat(Enumerable.Range(0, length).Select(i => (row + 1, index + i)))
+            .Concat(Enumerable.Range(-1, 3).Select(i => (row + i, index - 1))).Concat(Enumerable.Range(-1, 3).Select(i => (row + i, index + length)))
+            .Where(c => c.Item1 >= 0 && c.Item1 < input.Length && c.Item2 >= 0 && c.Item2 < input[c.Item1].Length);
 
-        var right = index + length;
-        if (right < input[row].Length)
-        {
-            yield return input[row][right]; // right
-            if (row > 0)
-                yield return input[row - 1][right]; // top left
-            if (row < input.Length - 1)
-                yield return input[row + 1][right]; // bottom left
-        }
-
-        // above and below
-        for (int i = 0; i < length; i++)
-        {
-            if (row > 0)
-                yield return input[row - 1][index + i];
-            if (row < input.Length - 1)
-                yield return input[row + 1][index + i];
-        }
-    }
-
-    public static IEnumerable<(int, int)> GetAllAdjacentInfo(string[] input, int row, int index, int length)
-    {
-        var left = index - 1;
-        if (left > 0)
-        {
-            yield return (row, left); // left
-            if (row > 0)
-                yield return (row - 1, left); // top left
-            if (row < input.Length - 1)
-                yield return (row + 1, left); // bottom left
-        }
-
-        var right = index + length;
-        if (right < input[row].Length)
-        {
-            yield return (row, right); // right
-            if (row > 0)
-                yield return (row - 1, right); // top left
-            if (row < input.Length - 1)
-                yield return (row + 1, right); // bottom left
-        }
-
-        // above and below
-        for (int i = 0; i < length; i++)
-        {
-            if (row > 0)
-                yield return (row - 1, index + i);
-            if (row < input.Length - 1)
-                yield return (row + 1, index + i);
-        }
-    }
+    public static (string left, string right) FindNum(string row, int index)
+    => (string.Concat(row[..index].Reverse().TakeWhile(c => '0' <= c && c <= '9').Reverse()), string.Concat(row[(index + 1)..].TakeWhile(c => '0' <= c && c <= '9')));
 
     public string SolvePart1(string input)
     {
         var lines = input.Split(Environment.NewLine);
-        int total = 0;
-
-        for (int i = 0; i < lines.Length; i++)
-        {
-            var nums = Utils.FindAll(@"\d+", lines[i]).ToArray();
-
-            for (int j = 0; j < nums.Length; j++)
-            {
-                var num = int.Parse(nums[j].Value);
-                var index = nums[j].Index;
-                var length = nums[j].Length;
-
-                if (GetAllAdjacent(lines, i, index, length).Any(i => i != '.' && (i < '0' || i > '9')))
-                    total += num;
-            }
-        }
-
-
-        return $"{total}";
-    }
-
-    public static (int, int) FindNum(string row, int index)
-    {
-        int start = index - 1;
-        while (true)
-        {
-            if (start < 0) break;
-            if (row[start] < '0' || row[start] > '9') break;
-            start--;
-        }
-
-        int end = index + 1;
-        while (true)
-        {
-            if (end >= row.Length) break;
-            if (row[end] < '0' || row[end] > '9') break;
-            end++;
-        }
-
-        Console.WriteLine($"{start}..{end} == {row[(start + 1)..end]}");
-
-        return (start+1,end);
+        return $"{lines.Select((l, i) =>
+            Utils.FindAll(@"\d+", l)
+                .Where(n => GetAllAdjacent(lines, i, n.Index, n.Length)
+                    .Select(c => lines[c.Item1][c.Item2])
+                    .Any(i => i != '.' && (i < '0' || i > '9'))
+                ).Sum(n => int.Parse(n.Value))
+        ).Sum()}";
     }
 
     public string SolvePart2(string input)
     {
         var lines = input.Split(Environment.NewLine);
-        int total = 0;
-
-        for (int i = 0; i < lines.Length; i++)
-        {
-            var nums = Utils.FindAll(@"\*", lines[i]).ToArray();
-
-            for (int j = 0; j < nums.Length; j++)
-            {
-                //var num = int.Parse(nums[j].Value);
-                var index = nums[j].Index;
-                var length = nums[j].Length;
-
-                var adjacents = GetAllAdjacentInfo(lines, i, index, length).ToArray();
-
-                var partNums = adjacents.Where(i => lines[i.Item1][i.Item2] >= '0' && lines[i.Item1][i.Item2] <= '9').ToArray();
-
-                var fullNums = partNums.Select(n => (FindNum(lines[n.Item1], n.Item2), n.Item1)).Distinct().ToArray();
-
-                if (fullNums.Length == 2)
-                {
-                    total += int.Parse(lines[fullNums[0].Item2][fullNums[0].Item1.Item1..fullNums[0].Item1.Item2])
-                           * int.Parse(lines[fullNums[1].Item2][fullNums[1].Item1.Item1..fullNums[1].Item1.Item2]);
-                }
-
-            }
-        }
+        int total = lines.Select((l, i) =>
+            Utils.FindAll(@"\*", l)
+                .Select(g => GetAllAdjacent(lines, i, g.Index, 1)
+                    .Where(i => lines[i.Item1][i.Item2] >= '0' && lines[i.Item1][i.Item2] <= '9')
+                //                                  rowIndex  colIndex       (12, 45) given the lines[Item1,Item2] = 12345
+                    .Select(n => (n.Item1, n.Item2, FindNum(lines[n.Item1], n.Item2)))
+                    //           rowIndex, colIndex,    12,            45,            index of 1 in 12               index of 5 in 45
+                    .Select(t => (t.Item1, t.Item2, t.Item3.left, t.Item3.right, t.Item2 - t.Item3.left.Length, t.Item2 + t.Item3.right.Length))
+                    .DistinctBy(t => (t.Item1, t.Item5, t.Item6)) // distinct by indices of 1 and 5, the full number AND it's row
+                    .Select(t => t.left + lines[t.Item1][t.Item2] + t.right) // create full number now, 12345
+                    .Select(int.Parse)
+                    .ToArray())
+                .Where(g => g.Length == 2)
+                .Sum(g => g.Aggregate((acc, v) => acc * v))
+            ).Sum();
 
         return $"{total}";
     }
