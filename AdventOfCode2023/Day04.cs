@@ -19,18 +19,10 @@ public class Day04 : IDay
     public string SolvePart2(string input)
     {
         var lines = input.Split(Environment.NewLine);
-        var instances = Enumerable.Range(0, lines.Length).ToDictionary(i => i, i => 1);
-        return $"{lines
-            .Select(l => l.Split(" | ").Select(i => i.Split(": ").Last()).Select(s => s.Split(' ').Select(e => e.Trim()).Where(i => i != " " && i != "")).ToArray())
+        return $"{lines.Select(l => l.Split(" | ").Select(i => i.Split(": ").Last()).Select(s => s.Split(' ').Select(e => e.Trim()).Where(i => i != " " && i != "")).ToArray())
             .Select(l => l[0].Intersect(l[1]).Count())
-            .Select((l, i) => {
-                for (int j = 0; j < instances[i]; j++)
-                {
-                    for (int k = 1; k <= l; k++)
-                        instances[i + k]++;
-                }
-                return l;
-            })
-            .SelectMany((l, i) => Enumerable.Repeat(l, instances[i])).Count()}";
+            .Select((s, i) => (s, i))
+            .Aggregate((0, Enumerable.Repeat(1, lines.Length).ToArray()), (acc, s) => (acc.Item1 + acc.Item2[s.i], (s.i > 0 ? acc.Item2[..s.i] : []).Append(acc.Item2[s.i]).Concat(s.i < acc.Item2.Length - 1 ? acc.Item2[(s.i + 1)..Math.Min(acc.Item2.Length, s.i + s.s + 1)].Select(x => x + acc.Item2[s.i]) : []).Concat(s.i + s.s + 1 < acc.Item2.Length ? acc.Item2[(s.i + s.s + 1)..] : []).ToArray()))
+            .Item1}";
     }
 }
