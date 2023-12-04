@@ -12,46 +12,25 @@ public class Day04 : IDay
     };
 
     public string SolvePart1(string input)
-    {
-        var total = 0;
-
-        var lines = input.Split(Environment.NewLine);
-        for (int i = 0; i < lines.Length; i++)
-        {
-            var line = lines[i];
-            var sides = line.Split(" | ").Select(i => i.Split(": ").Last()).Select(s => s.Split(' ').Select(e => e.Trim()).Where(i => i != " " && i != "")).ToArray();
-
-            var score = (int)Math.Pow(2, sides[0].Intersect(sides[1]).Count() - 1);
-
-            total += score;
-        }
-
-        return $"{total}";
-    }
+        => $"{input.Split(Environment.NewLine).Select(l =>
+            l.Split(" | ").Select(i => i.Split(": ").Last()).Select(s => s.Split(' ').Where(i => i != string.Empty)).ToArray())
+            .Sum(l => (int)Math.Pow(2, l[0].Intersect(l[1]).Count() - 1))}";
 
     public string SolvePart2(string input)
     {
-        var count = 0;
         var lines = input.Split(Environment.NewLine);
         var instances = Enumerable.Range(0, lines.Length).ToDictionary(i => i, i => 1);
-
-        for (int i = 0; i < lines.Length; i++)
-        {
-            var line = lines[i];
-            var sides = line.Split(" | ").Select(i => i.Split(": ").Last()).Select(s => s.Split(' ').Select(e => e.Trim()).Where(i => i != " " && i != "")).ToArray();
-
-            var score = sides[0].Intersect(sides[1]).Count();
-
-            Console.WriteLine(score);
-            for (int j = 0; j < instances[i]; j++)
-            {
-                for (int k = 1; k <= score; k++)
-                    instances[i + k]++;
-            
-                count++;
-            }
-        }
-
-        return $"{instances.Sum(i => i.Value)}";
+        return $"{lines
+            .Select(l => l.Split(" | ").Select(i => i.Split(": ").Last()).Select(s => s.Split(' ').Select(e => e.Trim()).Where(i => i != " " && i != "")).ToArray())
+            .Select(l => l[0].Intersect(l[1]).Count())
+            .Select((l, i) => {
+                for (int j = 0; j < instances[i]; j++)
+                {
+                    for (int k = 1; k <= l; k++)
+                        instances[i + k]++;
+                }
+                return l;
+            })
+            .SelectMany((l, i) => Enumerable.Repeat(l, instances[i])).Count()}";
     }
 }
