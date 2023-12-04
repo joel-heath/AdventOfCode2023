@@ -15,25 +15,22 @@ public partial class Day03 : IDay
     };
 
     public string SolvePart1(string input)
-    {
-        var lines = input.Split(Environment.NewLine);
-        return $"{lines.Select((l, i) =>
+        => $"{new string[][] { input.Split(Environment.NewLine) }
+            .Select(lines => lines.Select((l, i) =>
+            lines.Select((l, i) =>
             DigitsRegex().Matches(l).SelectMany(m => m.Groups.Cast<Group>().Select(g => g.Captures[0]))
                 .Where(n =>
                     Enumerable.Range(0, n.Length).Select(j => (i - 1, n.Index + j)).Concat(Enumerable.Range(0, n.Length).Select(j => (i + 1, n.Index + j)))
                     .Concat(Enumerable.Range(-1, 3).Select(j => (i + j, n.Index - 1))).Concat(Enumerable.Range(-1, 3).Select(j => (i + j, n.Index + n.Length)))
                     .Where(c => c.Item1 >= 0 && c.Item1 < lines.Length && c.Item2 >= 0 && c.Item2 < lines[c.Item1].Length)
                     .Select(c => lines[c.Item1][c.Item2])
-                    .Any(i => i != '.' && (i < '0' || i > '9'))
-                ).Sum(n => int.Parse(n.Value))
-        ).Sum()}";
-    }
+                    .Any(i => i != '.' && (i < '0' || i > '9')))
+                .Sum(n => int.Parse(n.Value)))
+            .Sum())).First()}";
 
     public string SolvePart2(string input)
-    {
-        var lines = input.Split(Environment.NewLine);
-        return $"{lines.Select((l, i) =>
-            GearsRegex().Matches(l).SelectMany(m => m.Groups.Cast<Group>().Select(g => g.Captures[0]))
+        => $"{new string[][] { input.Split(Environment.NewLine) }
+            .Select(lines => lines.Select((l, i) => GearsRegex().Matches(l).SelectMany(m => m.Groups.Cast<Group>().Select(g => g.Captures[0]))
                 .Select(g => new (int, int)[] { (i - 1, g.Index), (i + 1, g.Index) }
                     .Concat(Enumerable.Range(-1, 3).Select(j => (i + j, g.Index - 1))).Concat(Enumerable.Range(-1, 3).Select(j => (i + j, g.Index + 1)))
                     .Where(c => c.Item1 >= 0 && c.Item1 < lines.Length && c.Item2 >= 0 && c.Item2 < lines[c.Item1].Length)
@@ -44,12 +41,10 @@ public partial class Day03 : IDay
                     .DistinctBy(t => (t.Item1, t.Item5, t.Item6))
                     .Select(t => t.Item3 + lines[t.Item1][t.Item2] + t.Item4)
                     .Select(int.Parse)
-                    .ToArray()
-                )
+                    .ToArray())
                 .Where(g => g.Length == 2)
-                .Sum(g => g.Aggregate((acc, v) => acc * v))
-            ).Sum()}";
-    }
+                .Sum(g => g.Aggregate((acc, v) => acc * v)))
+            .Sum()).First()}";
 
     [GeneratedRegex(@"\d+")]
     private static partial Regex DigitsRegex();

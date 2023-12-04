@@ -26,5 +26,5 @@ public class Day01 : IDay
         => $"{input.Split(Environment.NewLine).Sum(r => int.Parse($"{r.First(i => i >= '1' && i <= '9')}" + $"{r.Last(i => i >= '1' && i <= '9')}"))}";
 
     public string SolvePart2(string input)
-        => SolvePart1(input.Replace("zero", "zero0zero").Replace("one", "one1one").Replace("two", "two2two").Replace("three", "three3three").Replace("four", "four4four").Replace("five", "five5five").Replace("six", "six6six").Replace("seven", "seven7seven").Replace("eight", "eight8eight").Replace("nine", "nine9nine"));
+        => SolvePart1(input.Replace("zero", "0o").Replace("one", "o1e").Replace("two", "t2o").Replace("three", "t3e").Replace("four", "4").Replace("five", "5e").Replace("six", "6").Replace("seven", "7n").Replace("eight", "e8t").Replace("nine", "n9e"));
 }

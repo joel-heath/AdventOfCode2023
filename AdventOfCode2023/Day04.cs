@@ -17,12 +17,11 @@ public class Day04 : IDay
             .Sum(l => (int)Math.Pow(2, l[0].Intersect(l[1]).Count() - 1))}";
 
     public string SolvePart2(string input)
-    {
-        var lines = input.Split(Environment.NewLine);
-        return $"{lines.Select(l => l.Split(" | ").Select(i => i.Split(": ").Last()).Select(s => s.Split(' ').Select(e => e.Trim()).Where(i => i != " " && i != "")).ToArray())
+        => $"{new string[][] { input.Split(Environment.NewLine) }
+            .Select(lines => lines.Select(l =>
+                l.Split(" | ").Select(i => i.Split(": ").Last()).Select(s => s.Split(' ').Select(e => e.Trim()).Where(i => i != " " && i != "")).ToArray())
             .Select(l => l[0].Intersect(l[1]).Count())
             .Select((s, i) => (s, i))
             .Aggregate((0, Enumerable.Repeat(1, lines.Length).ToArray()), (acc, s) => (acc.Item1 + acc.Item2[s.i], (s.i > 0 ? acc.Item2[..s.i] : []).Append(acc.Item2[s.i]).Concat(s.i < acc.Item2.Length - 1 ? acc.Item2[(s.i + 1)..Math.Min(acc.Item2.Length, s.i + s.s + 1)].Select(x => x + acc.Item2[s.i]) : []).Concat(s.i + s.s + 1 < acc.Item2.Length ? acc.Item2[(s.i + s.s + 1)..] : []).ToArray()))
-            .Item1}";
-    }
+            .Item1).First()}";
 }
