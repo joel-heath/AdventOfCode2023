@@ -69,77 +69,7 @@ public class Day05 : IDay
         return $"{seeds.Min()}";
     }
 
-    public long GetLocation(long seed, List<List<(long destination, long source, long range)>> mappings)
-    {
-        for (int i = 0; i < mappings.Count; i++)
-        {
-            var mapping = mappings[i];
-
-            for (int j = 0; j < mapping.Count; j++)
-            {
-                var map = mapping[j];
-
-                if (map.source <= seed && map.source + map.range > seed)
-                {
-                    var offset = seed - map.source;
-                    seed = map.destination + offset;
-                    break;
-                }
-            }
-        }
-
-        return seed;
-    }
-
     public string SolvePart2(string input)
-    {
-        var blocks = input.Split(Environment.NewLine + Environment.NewLine);
-        var seeds = blocks[0].Split(" ")[1..].Select(long.Parse).Chunk(2).Select(i => (i[0], i[1])).ToList();
-        var mapsRaw = blocks[1..];
-        var mappings = new List<List<(long destination, long source, long range)>>();
-
-
-        for (long i = 0; i < mapsRaw.Length; i++)
-        {
-            var lines = mapsRaw[i].Split(Environment.NewLine)[1..];
-
-            var mapping = new List<(long destination, long source, long range)>();
-
-            for (long j = 0; j < lines.Length; j++)
-            {
-                var line = lines[j];
-
-                var data = line.Split(" ").Select(long.Parse).ToArray();
-
-                var destination = data[0];
-                var source = data[1];
-                var range = data[2];
-
-
-                mapping.Add((destination, source, range));
-            }
-
-            mappings.Add(mapping);
-        }
-
-        long min = long.MaxValue;
-        foreach (var seedRange in seeds)
-        {
-            for (var i = 0; i < seedRange.Item2; i++)
-            {
-                var res = GetLocation(seedRange.Item1 + i, mappings);
-                if (res < min)
-                {
-                    min = res;
-                    Console.WriteLine(min);
-                }
-            }
-        }
-
-        return $"{min}";
-    }
-
-    public string SolvePart2Better(string input)
     {
         var blocks = input.Split(Environment.NewLine + Environment.NewLine);
         var seeds = blocks[0].Split(" ")[1..].Select(long.Parse).Chunk(2).Select(i => (i[0], i[1])).ToList();
@@ -147,8 +77,6 @@ public class Day05 : IDay
 
         for (long i = 0; i < maps.Length; i++)
         {
-            seeds.Dump();
-
             var lines = maps[i].Split(Environment.NewLine)[1..];
 
             var mappings = new List<(long destination, long source, long range)>();
@@ -167,21 +95,18 @@ public class Day05 : IDay
                 mappings.Add((destination, source, range));
             }
 
-            seeds = seeds.OrderBy(s => s.Item1).ToList();
-            mappings = mappings.OrderBy(s => s.source).ToList();
+            seeds = [.. seeds.OrderBy(s => s.Item1)];
+            mappings = [.. mappings.OrderBy(s => s.source)];
 
-            List<(long source, long range)> newSeeds = new();
+            List<(long source, long range)> newSeeds = [];
             var queue = new Queue<(long source, long range)>(seeds);
 
             while (queue.TryDequeue(out var seed))
             {
-                //seed.Dump();
                 bool mappedSeed = false;
                 foreach (var mapping in mappings)
                 {
-                    if (seed.source + seed.range <= mapping.source || seed.source > mapping.source + mapping.range) continue;
-
-                    //mapping.Dump();
+                    if (seed.source + seed.range <= mapping.source || seed.source >= mapping.source + mapping.range) continue;
 
                     long start = seed.source;
                     if (seed.source < mapping.source)
@@ -197,7 +122,7 @@ public class Day05 : IDay
 
                     if (mappingEnd < seedEnd)
                     {
-                        queue.Enqueue((mappingEnd, seed.range - (mappingEnd - start) - 1));
+                        queue.Enqueue((mappingEnd, seed.range - (mappingEnd - start)));
                         end = mappingEnd;
                     }
 
