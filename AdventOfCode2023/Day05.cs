@@ -1,4 +1,7 @@
 using System;
+using System.ComponentModel;
+using System.Linq;
+using System.Text;
 
 namespace AdventOfCode2023;
 public class Day05 : IDay
@@ -33,40 +36,57 @@ public class Day05 : IDay
     }
 
     public string SolvePart1(string input)
+        => $"{new string[][] { input.Split(Environment.NewLine + Environment.NewLine) }
+            .Select(b =>
+                new (long[], string[])[] { (b[0].Split(" ")[1..].Select(long.Parse).ToArray(), b[1..]) }
+                .Select<(long[] seeds, string[] maps), long>(i =>
+                    new IEnumerable<HashSet<(long destination, long source, long range)>>[] { i.maps.Select(m => m.Split(Environment.NewLine)[1..].Select(l => l.Split(" ").Select(long.Parse).ToArray())
+                                .Select<long[], (long destination, long source, long range)>(d => (d[0], d[1], d[2])).ToHashSet()) }
+                                .Select(mappings =>
+                                    i.seeds.Select(s => 
+                                        mappings.Aggregate(s, (seedAcc, m) => Map(m, seedAcc))
+                                    ).Min()
+                                ).First()
+                    ).First()).First()}";
+
+    public IEnumerable<(long source, long range)> MapSeedRanges(List<(long source, long range)> seeds, IReadOnlyList<(long destination, long source, long range)> mappings)
+    {
+        if (seeds.Count == 0) return [];
+        var s = seeds[0];
+
+        return new (long destination, long source, long range)[] { mappings.FirstOrDefault(m => s.source + s.range <= m.source || s.source >= m.source + m.range) }
+                .SelectMany(m => m == (0, 0, 0)
+                ? new List<(long source, long range)>() { (s.source, s.range) }.Concat(MapSeedRanges(seeds.Count > 1 ? seeds[1..] : [], mappings))
+                : (s.source < m.source ? [(s.source, m.source)] : new List<(long source, long range)>())
+                            .Append((m.destination + Math.Max(s.source, m.source) - m.source, Math.Min(s.source + s.range, m.source + m.range) - Math.Max(s.source, m.source)))
+                            //.ToList()
+                            .Concat(MapSeedRanges([..(seeds.Count > 1 ? seeds[1..] : []).Concat(m.source + m.range < s.source + s.range ? [(m.source + m.range, s.range - (m.source + m.range - Math.Max(s.source, m.source)))] : Array.Empty<(long source, long range)>())], mappings))
+                            //.ToList()
+                    );
+    }
+
+    public string SolvePart2WorkInProgressOneLiner(string input)
     {
         var blocks = input.Split(Environment.NewLine + Environment.NewLine);
-        var seeds = blocks[0].Split(" ")[1..].Select(long.Parse).ToArray();
+        var seeds = blocks[0].Split(" ")[1..].Select(long.Parse).Chunk(2).Select(i => (i[0], i[1])).ToList();
         var maps = blocks[1..];
-
 
         for (long i = 0; i < maps.Length; i++)
         {
-            var lines = maps[i].Split(Environment.NewLine)[1..];
+            var mappings = new IEnumerable<List<(long destination, long source, long range)>>[] { maps.Select(m => m.Split(Environment.NewLine)[1..].Select(l => l.Split(" ").Select(long.Parse).ToArray())
+                                .Select<long[], (long destination, long source, long range)>(d => (d[0], d[1], d[2])).ToList()) }
+                                .First().First();
 
-            var mapping = new HashSet<(long destination, long source, long range)>();
+            seeds = [.. seeds.OrderBy(s => s.Item1)];
+            mappings = [.. mappings.OrderBy(s => s.source)];
 
-            for (long j = 0; j < lines.Length; j++)
-            {
-                var line = lines[j];
+            List<(long source, long range)> newSeeds = [];
+            //var queue = new Queue<(long source, long range)>(seeds);
 
-                var data = line.Split(" ").Select(long.Parse).ToArray();
-
-                var destination = data[0];
-                var source = data[1];
-                var range = data[2];
-
-
-                mapping.Add((destination, source, range));
-            }
-
-            for (long j = 0; j < seeds.Length; j++)
-            {
-                seeds[j] = Map(mapping, seeds[j]);
-            }
-
+            seeds = MapSeedRanges(seeds, mappings).ToList();
         }
 
-        return $"{seeds.Min()}";
+        return $"{seeds.Min(x => x.Item1)}";
     }
 
     public string SolvePart2(string input)
