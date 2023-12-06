@@ -12,40 +12,16 @@ public class Day06 : IDay
     };
 
     public string SolvePart1(string input)
-    {
-        var lines = input.Split(Environment.NewLine).Select(l => l.Split(' ').Skip(1).Where(c => c != string.Empty).Select(int.Parse).ToArray()).ToArray();
-
-        var product = 1;
-        for (int i = 0; i < lines[0].Length; i++)
-        {
-            var time = lines[0][i];
-            var best = lines[1][i];
-
-            // would be celing, but matching the record isnt a new record, so you round up even if its an integer
-            var lowerBound = (int)Math.Floor(time / 2.0 - Math.Sqrt((double)time * time / 4.0 - best)) + 1;
-            var upperBound = (int)Math.Ceiling(time / 2.0 + Math.Sqrt((double)time * time / 4.0 - best)) - 1;
-
-            product *= upperBound - lowerBound + 1;
-        }
-
-        return $"{product}";
-    }
+        => $"{input.Split(Environment.NewLine).Select(l => l.Split(' ').Skip(1).Where(c => c != string.Empty).Select(int.Parse).ToArray()).ToArray()
+            .Transpose().Select(i => i.ToArray()).ToArray()
+            .Select(l => (l[0] / 2.0, Math.Sqrt((double)l[0] * l[0] / 4.0 - l[1])))
+            .Select(l => (int)Math.Ceiling(l.Item1 + l.Item2) - (int)Math.Floor(l.Item1 - l.Item2) - 1)
+            .Aggregate((a, i) => a * i)}";
 
     public string SolvePart2(string input)
-    {
-        var lines = input.Split(Environment.NewLine).Select(l => l.Split(' ').Skip(1).Where(c => c != string.Empty)
-            .Aggregate((a, c) => a + c)).Select(long.Parse).ToArray();
-
-        var product = 1;
-
-        var time = lines[0];
-        var best = lines[1];
-
-        int count = 0;
-
-        var lowerBound = (int)Math.Floor(time / 2.0 - Math.Sqrt((double)time * time / 4.0 - best)) + 1;
-        var upperBound = (int)Math.Ceiling(time / 2.0 + Math.Sqrt((double)time * time / 4.0 - best)) - 1;
-
-        return $"{upperBound - lowerBound + 1}";
-    }
+        => $"{new long[][] { input.Split(Environment.NewLine).Select(l => l.Split(' ').Skip(1).Where(c => c != string.Empty)
+            .Aggregate((a, c) => a + c)).Select(long.Parse).ToArray() }
+            .Select(l => (l[0] / 2.0, Math.Sqrt((double)l[0] * l[0] / 4.0 - l[1])))
+            .Select(l => (int)Math.Ceiling(l.Item1 + l.Item2) - (int)Math.Floor(l.Item1 - l.Item2) - 1)
+            .First()}";
 }
