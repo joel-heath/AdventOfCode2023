@@ -21,17 +21,11 @@ public class Day06 : IDay
             var time = lines[0][i];
             var best = lines[1][i];
 
-            int count = 0;
-            for (int j = 0; j <= time; j++)
-            {
-                var timeMoving = time - j;
-                var distance = j * timeMoving;
+            // would be celing, but matching the record isnt a new record, so you round up even if its an integer
+            var lowerBound = (int)Math.Floor(time / 2.0 - Math.Sqrt((double)time * time / 4.0 - best)) + 1;
+            var upperBound = (int)Math.Ceiling(time / 2.0 + Math.Sqrt((double)time * time / 4.0 - best)) - 1;
 
-                if (distance > best)
-                    count++;
-            }
-
-            product *= count;
+            product *= upperBound - lowerBound + 1;
         }
 
         return $"{product}";
@@ -43,20 +37,15 @@ public class Day06 : IDay
             .Aggregate((a, c) => a + c)).Select(long.Parse).ToArray();
 
         var product = 1;
-        
+
         var time = lines[0];
         var best = lines[1];
 
         int count = 0;
-        for (int j = 0; j <= time; j++)
-        {
-            var timeMoving = time - j;
-            var distance = j * timeMoving;
 
-            if (distance > best)
-                count++;
-        }
-        
-        return $"{count}";
+        var lowerBound = (int)Math.Floor(time / 2.0 - Math.Sqrt((double)time * time / 4.0 - best)) + 1;
+        var upperBound = (int)Math.Ceiling(time / 2.0 + Math.Sqrt((double)time * time / 4.0 - best)) - 1;
+
+        return $"{upperBound - lowerBound + 1}";
     }
 }
