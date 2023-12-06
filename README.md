@@ -2,7 +2,7 @@
 My C# solutions to [Advent of Code 2023](https://adventofcode.com/2023). Trying to one-liner as many as possible.
 
 ## Notes
-Here you can easily navigate each days code and read about how well I think I did, as well as how close I was to solving it in one line.
+Here you can easily navigate each days code & read about how well I think I did, as well as how close I was to solving it in one line.
 
 ### Legend
 🟢 Successful one-liner.<br>
@@ -17,7 +17,7 @@ Here you can easily navigate each days code and read about how well I think I di
 | [2](AdventOfCode2023/Day02.cs) | 🟢 | This one I went straight for regex, but the easier solution was splitting. I've got one-liners but they're complicated ones today, making good use of `GroupBy()` |
 | [3](AdventOfCode2023/Day03.cs) | 🟢 | Today's is a difficult one to reduce to one line as you need to search around a point, re-indexing the input. A simple solution is containerizing the input and iterating over that one-item collection. The input can then be parsed and then starting a new Select will allow the parsed input to be referenced. All thats needed at the end is a `.First()` |
 | [4](AdventOfCode2023/Day04.cs) | 🟢 | Part one is an easy one-liner, but part two is another one that in theory requires re-indexing, but using an aggregate to carry along an array while calculating the total allows it to be done. I'm not sure the one-liners will last much longer... |
-| [5](AdventOfCode2023/Day05.cs) | 🟠 | I got part one down to one line but part two is proving very difficult, due to one range being mapped to many ranges, which each could be mapped to more a procedural approach is a queue and a function is recursive, neither of which can be done in one line. Besides, my recursive solution doesn't work. This may be the end of the line for the one-liners. |
+| [5](AdventOfCode2023/Day05.cs) | 🟢 | Part one was straightforward, but part two... Due to one range being mapped to many ranges, which each could be mapped to more, the procedural approach is a queue and the functional is recursion. Part two itself is one line, and it calls another one line recursive function, technically `SolvePart2` could take in the requiered paramers defaulting to null & itself be recursive, therefore I consider this a successful one-liner. |
 | [6](AdventOfCode2023/Day06.cs) | 🟢 | A nice easy one to get us to forgive Eric for yesterday's. I solved this one by turning the problem into a quadratic in the time holding the button, then solving for f(x) > best. |
 | [7](AdventOfCode2023/Day07.cs) | ⚫ |  |
 | [8](AdventOfCode2023/Day08.cs) | ⚫ |  |
