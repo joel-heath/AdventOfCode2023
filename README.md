@@ -21,7 +21,7 @@ Since any one-liner calling another one-liner recursive function could be reduce
 | [4](AdventOfCode2023/Day04.cs) | 🟢 | Part one is an easy one-liner, but part two is another one that in theory requires re-indexing, but using an aggregate to carry along an array while calculating the total allows it to be done. I'm not sure the one-liners will last much longer... |
 | [5](AdventOfCode2023/Day05.cs) | 🟢 | Part one was straightforward, but part two... Due to one range being mapped to many ranges, which each could be mapped to more, recursion is required. My initial solution passed in a list of remaining ranges, took the first item and recursed on index 1 onwards (concatenating with any more ranges generated), but this means each time you have to `ToList()` the output. Now I'm passing in an IEnumerator and using the fact `MoveNext()` returns a bool telling whether or not there are more items (the base case). |
 | [6](AdventOfCode2023/Day06.cs) | 🟢 | A nice easy one to get us to forgive Eric for yesterday's. I solved this one by turning the problem into a quadratic in the time holding the button, then solving for f(x) > best. |
-| [7](AdventOfCode2023/Day07.cs) | ⚫ |  |
+| [7](AdventOfCode2023/Day07.cs) | 🟢 | Today's wasn't too bad, the end goal was to calculate a unique score for each possible hand, and use `OrderBy()` to do the rest of the work.I achieved this by treating the cards as a base 14 (since number 1 is skipped) number system, then adding very large quanities for the number of duplicate card values. |
 | [8](AdventOfCode2023/Day08.cs) | ⚫ |  |
 | [9](AdventOfCode2023/Day09.cs) | ⚫ |  |
 | [10](AdventOfCode2023/Day10.cs) | ⚫ |  |
