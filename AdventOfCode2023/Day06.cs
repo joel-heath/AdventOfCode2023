@@ -21,8 +21,7 @@ public class Day06 : IDay
             .Aggregate((a, i) => a * i)}";
 
     public string SolvePart2(string input)
-        => $"{new long[][] { input.Split(Environment.NewLine).Select(l => l.Split(' ').Skip(1).Where(c => c != string.Empty)
-            .Aggregate((a, c) => a + c)).Select(long.Parse).ToArray() }
+        => $"{new long[][] { input.Split(Environment.NewLine).Select(l => long.Parse(string.Concat(l.Split(' ').Skip(1)))).ToArray() }
             .Select(l => (l[0] / 2.0, Math.Sqrt((double)l[0] * l[0] / 4.0 - l[1])))
             .Select(l => (int)Math.Ceiling(l.Item1 + l.Item2) - (int)Math.Floor(l.Item1 - l.Item2) - 1)
             .First()}";

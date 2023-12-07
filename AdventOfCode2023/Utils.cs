@@ -1,4 +1,5 @@
 ﻿using System.Text.RegularExpressions;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace AdventOfCode2023;
 public static class Utils
@@ -17,4 +18,8 @@ public static class Utils
 
     public static IEnumerable<Capture> FindAllOverlap(string pattern, string str)
         => new Regex("(?=(" + pattern + "))").Matches(str).SelectMany(m => m.Groups[1].Captures);
+
+    public static IEnumerable<long> GetLongs(string str)
+        => Matches(@"-?\d+", str).Select(long.Parse);
+
 }
