@@ -1,7 +1,7 @@
 using System.Text.RegularExpressions;
 
 namespace AdventOfCode2023;
-public class Day08 : IDay
+public partial class Day08 : IDay
 {
     public int Day => 8;
     public Dictionary<string, string> UnitTestsP1 => new()
@@ -21,78 +21,36 @@ public class Day08 : IDay
         {
             "LR\r\n\r\n11A = (11B, XXX)\r\n11B = (XXX, 11Z)\r\n11Z = (11B, XXX)\r\n22A = (22B, XXX)\r\n22B = (22C, 22C)\r\n22C = (22Z, 22Z)\r\n22Z = (22B, 22B)\r\nXXX = (XXX, XXX)",
             "6"
-        },
-
+        }
     };
 
-    public string SolvePart1(string input)
+    public static long NodeFinder(string start, Dictionary<string, (string,string)> graph, string instructions, bool tripleZ)
     {
-        var lines = input.Split(Environment.NewLine + Environment.NewLine);
-
-        var instructions = lines[0];
-
-        var graph = new Regex(@"([A-Z])([A-Z])([A-Z])").Matches(lines[1]).SelectMany(m => m.Groups.Cast<Group>().Select(g => g.Captures[0].Value))
-                    .Where((c, i) => i % 4 == 0)
-                    .Chunk(3)
-                    .ToDictionary(i => i[0], i => (i[1], i[2]));
-
-        var current = "AAA";
-
         long j = 0;
-        for (; current != "ZZZ"; j++)
-        {
-            (string left, string right) = graph[current];
-
-            current = instructions[(int)(j % instructions.Length)] == 'L'
-                    ? left
-                    : right;
-        }
-
-        return $"{j}";
+        for (; tripleZ && start != "ZZZ" || !tripleZ && start[2] != 'Z'; j++)
+            start = new (string left, string right)[] { graph[start] }.Select(t => instructions[(int)(j % instructions.Length)] == 'L' ? t.left : t.right).First();
+        return j;
     }
 
-    static long GCF(long a, long b)
-    {
-        while (b != 0)
-        {
-            (a, b) = (b, a % b);
-        }
-        return a;
-    }
-
-    static long LCM(long a, long b)
-        => a * b / GCF(a, b);
+    public string SolvePart1(string input)
+        => $"{new string[][] { input.Split(Environment.NewLine + Environment.NewLine) }.Select(lines =>
+            NodeFinder("AAA", Node().Matches(lines[1]).SelectMany(m => m.Groups.Cast<Group>().Select(g => g.Captures[0].Value))
+                    .Chunk(3)
+                    .ToDictionary(i => i[0], i => (i[1], i[2])),
+                    lines[0], true))
+            .First()}";
 
     public string SolvePart2(string input)
-    {
-        var lines = input.Split(Environment.NewLine + Environment.NewLine);
+        => $"{new string[][] { input.Split(Environment.NewLine + Environment.NewLine) }
+            .Select(lines => (Node().Matches(lines[1]).SelectMany(m => m.Groups.Cast<Group>().Select(g => g.Captures[0].Value))
+                .Chunk(3)
+                .ToDictionary(i => i[0], i => (i[1], i[2])),
+                lines[0]))
+            .Select(d => d.Item1.Keys.Where(k => k[2] == 'A')
+                .Select(c => NodeFinder(c, d.Item1, d.Item2, false))
+                .Aggregate(Utils.LCM))
+            .First()}";
 
-        var instructions = lines[0];
-
-        var graph = new Regex(@"([A-Z0-9])([A-Z0-9])([A-Z0-9])").Matches(lines[1]).SelectMany(m => m.Groups.Cast<Group>().Select(g => g.Captures[0].Value))
-                    .Where((c, i) => i % 4 == 0)
-                    .Chunk(3)
-                    .ToDictionary(i => i[0], i => (i[1], i[2]));
-
-        var currents = graph.Keys.Where(k => k[2] == 'A').ToArray();
-        var lengths = new long[currents.Length];
-
-        for (int i = 0; i < currents.Length; i++)
-        {
-            var current = currents[i];
-            long j = 0;
-            for (; current[2] != 'Z'; j++)
-            {
-                (string left, string right) = graph[current];
-
-                current = instructions[(int)(j % instructions.Length)] == 'L'
-                        ? left
-                        : right;
-            }
-
-            lengths[i] = j;
-        }
-
-        return $"{lengths.Aggregate(LCM)}";
-    }
+    [GeneratedRegex(@"\w{3}")]
+    private static partial Regex Node();
 }

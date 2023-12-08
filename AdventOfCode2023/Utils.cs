@@ -3,6 +3,18 @@
 namespace AdventOfCode2023;
 public static class Utils
 {
+    public static long GCF(long a, long b)
+    {
+        while (b != 0)
+        {
+            (a, b) = (b, a % b);
+        }
+        return a;
+    }
+
+    public static long LCM(long a, long b) => a * b / GCF(a, b);
+    public static long LCM(params long[] a) => a.Aggregate(LCM);
+
     public static bool IsMatch(string pattern, string str)
     => new Regex(pattern).Match(str).Success;
 
