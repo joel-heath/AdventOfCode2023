@@ -1,5 +1,4 @@
 ﻿using System.Text.RegularExpressions;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace AdventOfCode2023;
 public static class Utils
