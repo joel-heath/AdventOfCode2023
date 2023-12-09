@@ -31,6 +31,6 @@ public static class Utils
         => new Regex("(?=(" + pattern + "))").Matches(str).SelectMany(m => m.Groups[1].Captures);
 
     public static IEnumerable<long> GetLongs(string str)
-        => Matches(@"-?\d+", str).Select(long.Parse);
+        => FindAll(@"-?\d+", str).Select(M => long.Parse(M.Value));
 
 }
