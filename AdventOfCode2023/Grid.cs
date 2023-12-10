@@ -7,31 +7,46 @@ public class Grid<T>(int x, int y)
     public int Width { get; } = x;
     public int Height { get; } = y;
 
-    public Grid(int x, int y, T defaultValue) : this(x, y)
-    {
-        foreach (var p in AllPositions())
-            this[p] = defaultValue;
-    }
-
     public T this[Point c]
     {
         get => points[c.X, c.Y];
         set => points[c.X, c.Y] = value;
     }
+    public T this[int x, int y]
+    {
+        get => points[x, y];
+        set => points[x, y] = value;
+    }
+
+    public Grid(int x, int y, T defaultValue) : this(x, y)
+    {
+        foreach (var p in AllPositions())
+            this[p] = defaultValue;
+    }
+    public Grid(T[][] contents) : this(contents[0].Length, contents.Length)
+    {
+        for (int r = 0; r < contents.Length; r++)
+        {
+            for (int c = 0; c < contents[0].Length; c++)
+            {
+                points[c, r] = contents[r][c];
+            }
+        }
+    }
 
     public bool IsInGrid(Point p) => p.X >= 0 && p.X < Width && p.Y >= 0 && p.Y < Height;
 
-    private static readonly IEnumerable<Point> cardinalNeighbours = new Point[] { (0, -1), (1, 0), (0, 1), (-1, 0) };
-    private static readonly IEnumerable<Point> diagonalNeighbours = new Point[] { (1, -1), (1, 1), (-1, 1), (-1, -1) };
+    public static readonly IEnumerable<Point> CardinalVectors = new Point[] { (0, -1), (1, 0), (0, 1), (-1, 0) };
+    public static readonly IEnumerable<Point> DiagonalVectors = new Point[] { (1, -1), (1, 1), (-1, 1), (-1, -1) };
 
-    public IEnumerable<Point> Neighbours(Point p, bool includeDiagonals = false)
+    public IEnumerable<Point> Adjacents(Point p, bool includeDiagonals = false)
     {
         if (p == (7, 1))
         {
-            var neighbours2 = includeDiagonals ? cardinalNeighbours.Concat(diagonalNeighbours) : cardinalNeighbours;
+            var neighbours2 = includeDiagonals ? CardinalVectors.Concat(DiagonalVectors) : CardinalVectors;
             return neighbours2.Select(n => p + n).Where(IsInGrid);
         }
-        var neighbours = includeDiagonals ? cardinalNeighbours.Concat(diagonalNeighbours) : cardinalNeighbours;
+        var neighbours = includeDiagonals ? CardinalVectors.Concat(DiagonalVectors) : CardinalVectors;
         return neighbours.Select(n => p + n).Where(IsInGrid);
     }
 

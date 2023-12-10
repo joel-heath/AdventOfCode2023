@@ -24,7 +24,7 @@ Since any one-liner calling another one-liner recursive function could be reduce
 | [7](AdventOfCode2023/Day07.cs) | 🟢 | Today's wasn't too bad, the end goal was to calculate a unique score for each possible hand, and use `OrderBy()` to do the rest of the work. I achieved this by treating the cards as a base 14 (since number 1 is skipped) number system, then adding very large quantities for the number of duplicate card values. |
 | [8](AdventOfCode2023/Day08.cs) | 🟡 | Part 2 is a classic lowest common multiple problem. Unfortunately today marks the end of the one-liner streak, due to multiple while loops which in one-liner world translate to recursion. However, after about 7000 recurses the program gives in. (I need 21,000+). Part 1 & 2 are one-liners, but I've got another function which is not one line long. |
 | [9](AdventOfCode2023/Day09.cs) | 🟢 | Full one-liners today, which I was not expecting. I achieved it through using `Aggregate()` three times for part two. |
-| [10](AdventOfCode2023/Day10.cs) | ⚫ |  |
+| [10](AdventOfCode2023/Day10.cs) | 🟡 | Somehow I've written two one-liners with two class variables & a breadth-first search. I'm genuinely astonished I did this part two is the most gargantuan one-liner I've ever written. Unlike some I chose to solve part two through PIP even-odd ray casting. Thing's get funny when a point shares a coordinate with both vertices of an edge. |
 | [11](AdventOfCode2023/Day11.cs) | ⚫ |  |
 | [12](AdventOfCode2023/Day12.cs) | ⚫ |  |
 | [13](AdventOfCode2023/Day13.cs) | ⚫ |  |
