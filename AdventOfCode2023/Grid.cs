@@ -1,7 +1,7 @@
 ﻿using System.Text;
 
 namespace AdventOfCode2023;
-class Grid<T>(int x, int y)
+public class Grid<T>(int x, int y)
 {
     private readonly T[,] points = new T[x, y];
     public int Width { get; } = x;

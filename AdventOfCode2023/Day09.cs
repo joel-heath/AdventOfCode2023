@@ -1,6 +1,3 @@
-using System.Linq;
-using System.Net.Sockets;
-
 namespace AdventOfCode2023;
 public class Day09 : IDay
 {
@@ -24,7 +21,6 @@ public class Day09 : IDay
                         .TakeWhile(n => n.Length > 0).Sum(t => t.Length > 0 ? t[^1] : 0))
                 .First())
             .Sum()}";
-
 
     public string SolvePart2(string input)
         => $"{input.Split(Environment.NewLine).Select(l =>
