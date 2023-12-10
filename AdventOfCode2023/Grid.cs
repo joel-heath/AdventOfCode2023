@@ -26,6 +26,11 @@ public class Grid<T>(int x, int y)
 
     public IEnumerable<Point> Neighbours(Point p, bool includeDiagonals = false)
     {
+        if (p == (7, 1))
+        {
+            var neighbours2 = includeDiagonals ? cardinalNeighbours.Concat(diagonalNeighbours) : cardinalNeighbours;
+            return neighbours2.Select(n => p + n).Where(IsInGrid);
+        }
         var neighbours = includeDiagonals ? cardinalNeighbours.Concat(diagonalNeighbours) : cardinalNeighbours;
         return neighbours.Select(n => p + n).Where(IsInGrid);
     }
@@ -61,7 +66,7 @@ public class Grid<T>(int x, int y)
         }
         else if (direction == 3) // West
         {
-            for (int i = inclusive ? start.X : start.X + 1; i >= 0; i--)
+            for (int i = inclusive ? start.X : start.X - 1; i >= 0; i--)
             {
                 yield return (i, start.Y);
             }
@@ -74,7 +79,30 @@ public class Grid<T>(int x, int y)
             }
         }
         else { throw new ArgumentException("Invalid direction, may only be 0-3 (N,E,S,W)", nameof(direction)); }
+    }
 
+    public IEnumerable<Point> LineThrough(Point target, int direction, bool inclusive)
+    {
+        if (!IsInGrid(target)) yield break;
+
+        if (direction == 0) // North to south
+        {
+            for (int i = 0; i < Height; i++)
+            {
+                if (!inclusive || (i != target.Y))
+                    yield return (target.X, i);
+            }
+        }
+        else if (direction == 1) // East to west
+        {
+            for (int i = 0; i < Width; i++)
+            {
+                if (!inclusive || (i != target.X))
+                    yield return (target.Y, i);
+            }
+        }
+        
+        else { throw new ArgumentException("Invalid direction, may only be 0-1 (N-S,E-W)", nameof(direction)); }
     }
 
     public IEnumerable<Point> LineTo(Point start, Point end, bool inclusive = true)
