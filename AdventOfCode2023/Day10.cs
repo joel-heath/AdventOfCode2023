@@ -63,6 +63,7 @@ public class Day10 : IDay
         Queue<(Point, int)> toVisit = new([(start, 0)]);
 
         int max = 0;
+
         while (toVisit.TryDequeue(out var node))
         {
             visited.Add(node.Item1);

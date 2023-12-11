@@ -23,13 +23,13 @@ public class Grid<T>(int x, int y)
         foreach (var p in AllPositions())
             this[p] = defaultValue;
     }
-    public Grid(T[][] contents) : this(contents[0].Length, contents.Length)
+    public Grid(T[][] contents, bool transpose = true) : this(transpose ? contents[0].Length : contents.Length, transpose ? contents.Length : contents[0].Length)
     {
-        for (int r = 0; r < contents.Length; r++)
+        for (int r = 0; r < Height; r++)
         {
-            for (int c = 0; c < contents[0].Length; c++)
+            for (int c = 0; c < Width; c++)
             {
-                points[c, r] = contents[r][c];
+                points[c, r] = transpose ? contents[r][c] : contents[c][r];
             }
         }
     }
@@ -67,28 +67,28 @@ public class Grid<T>(int x, int y)
 
         if (direction == 0) // North
         {
-            for (int i = inclusive ? start.Y : start.Y - 1; i >= 0; i--)
+            for (long i = inclusive ? start.Y : start.Y - 1; i >= 0; i--)
             {
                 yield return (start.X, i);
             }
         }
         else if (direction == 2) // South
         {
-            for (int i = inclusive ? start.Y : start.Y + 1; i < Height; i++)
+            for (long i = inclusive ? start.Y : start.Y + 1; i < Height; i++)
             {
                 yield return (start.X, i);
             }
         }
         else if (direction == 3) // West
         {
-            for (int i = inclusive ? start.X : start.X - 1; i >= 0; i--)
+            for (long i = inclusive ? start.X : start.X - 1; i >= 0; i--)
             {
                 yield return (i, start.Y);
             }
         }
         else if (direction == 1) // East
         {
-            for (int i = inclusive ? start.X : start.X + 1; i < Width; i++)
+            for (long i = inclusive ? start.X : start.X + 1; i < Width; i++)
             {
                 yield return (i, start.Y);
             }
@@ -126,20 +126,20 @@ public class Grid<T>(int x, int y)
 
         if (start.X == end.X)
         {
-            int small = Math.Min(start.Y, end.Y);
-            int large = Math.Max(start.Y, end.Y);
+            long small = Math.Min(start.Y, end.Y);
+            long large = Math.Max(start.Y, end.Y);
 
-            for (int i = small; !inclusive && i < large || inclusive && i <= large; i++)
+            for (long i = small; !inclusive && i < large || inclusive && i <= large; i++)
             {
                 yield return (start.X, i);
             }
         }
         else if (start.Y == end.Y)
         {
-            int small = Math.Min(start.X, end.X);
-            int large = Math.Max(start.X, end.X);
+            long small = Math.Min(start.X, end.X);
+            long large = Math.Max(start.X, end.X);
 
-            for (int i = small; !inclusive && i < large || inclusive && i <= large; i++)
+            for (long i = small; !inclusive && i < large || inclusive && i <= large; i++)
             {
                 yield return (start.X, i);
             }
@@ -165,13 +165,13 @@ public class Grid<T>(int x, int y)
     }
 }
 
-public struct Point(int x, int y)
+public struct Point(long x, long y)
 {
-    public int X { get; set; } = x;
-    public int Y { get; set; } = y;
+    public long X { get; set; } = x;
+    public long Y { get; set; } = y;
 
-    public readonly int MDistanceTo(Point b) => Math.Abs(b.X - X) + Math.Abs(b.Y - Y);
-    public readonly int this[int index] => index == 0 ? X : Y;
+    public readonly long MDistanceTo(Point b) => Math.Abs(b.X - X) + Math.Abs(b.Y - Y);
+    public readonly long this[int index] => index == 0 ? X : Y;
 
     public static Point operator +(Point a, Point b) => new(a.X + b.X, a.Y + b.Y);
     public static Point operator -(Point a, Point b) => new(a.X - b.X, a.Y - b.Y);
@@ -183,11 +183,11 @@ public struct Point(int x, int y)
     public override readonly int GetHashCode() => HashCode.Combine(X, Y);
 
 
-    public static implicit operator Point((int x, int y) coords) => new(coords.x, coords.y);
-    //public static implicit operator (int X, int Y)(Point p) => (p.X, p.Y);
+    public static implicit operator Point((long x, long y) coords) => new(coords.x, coords.y);
+    //public static implicit operator (long X, long Y)(Point p) => (p.X, p.Y);
     public override readonly string ToString() => $"({X}, {Y})";
-    public readonly int[] ToArray() => [X, Y];
-    public readonly void Deconstruct(out int x, out int y)
+    public readonly long[] ToArray() => [X, Y];
+    public readonly void Deconstruct(out long x, out long y)
     {
         x = X;
         y = Y;

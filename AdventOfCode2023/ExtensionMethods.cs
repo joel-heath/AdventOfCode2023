@@ -31,4 +31,24 @@ public static class ExtensionMethods
             yield return acc;
         }
     }
+
+    public static TAccumulate AggregateWhileAvailable<TSource, TAccumulate>(this IEnumerable<TSource> source, TAccumulate seed, Func<TAccumulate, TSource, TAccumulate> accumulator, Func<TAccumulate, TSource, IEnumerable<TSource>> feedback)
+    {
+        Queue<TSource> queue = new();
+
+        var acc = seed;
+        foreach (var item in source)
+        {
+            acc = accumulator(acc, item);
+            foreach (var newItem in feedback(acc, item)) queue.Enqueue(newItem);
+        }
+
+        while (queue.TryDequeue(out var item))
+        {
+            acc = accumulator(acc, item);
+            foreach (var newItem in feedback(acc, item)) queue.Enqueue(newItem);
+        }
+
+        return acc;
+    }
 }
