@@ -7,6 +7,16 @@ public static class ExtensionMethods
         return input;
     }
 
+    public static T[][] Transpose<T>(this IEnumerable<IEnumerable<T>> source)
+        => source.SelectMany(inner => inner.Select((item, index) => new { item, index }))
+            .GroupBy(i => i.index, i => i.item)
+            .Select(g => g.ToArray()).ToArray();
+
+    public static IEnumerable<IEnumerable<T>> Combinations<T>(this IEnumerable<T> elements, int k)
+        => k == 0 ? new[] { Array.Empty<T>() } :
+          elements.SelectMany((e, i) =>
+            elements.Skip(i + 1).Combinations(k - 1).Select(c => (new[] { e }).Concat(c)));
+
     public static IEnumerable<TAcc> Scan<TSource, TAcc>(this IEnumerable<TSource> source, TAcc seed, Func<TAcc, TSource, TAcc> func)
     {
         var acc = seed;

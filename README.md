@@ -25,7 +25,7 @@ Since any one-liner calling another one-liner recursive function could be reduce
 | [8](AdventOfCode2023/Day08.cs) | 🟡 | Part 2 is a classic lowest common multiple problem. Unfortunately today marks the end of the one-liner streak, due to multiple while loops which in one-liner world translate to recursion. However, after about 7000 recurses the program gives in. (I need 21,000+). Part 1 & 2 are one-liners, but I've got another function which is not one line long. |
 | [9](AdventOfCode2023/Day09.cs) | 🟢 | Full one-liners today, which I was not expecting. I achieved it through using `Aggregate()` three times for part two. |
 | [10](AdventOfCode2023/Day10.cs) | 🟡 | Somehow I've written two one-liners with two class variables & a breadth-first search. I'm genuinely astonished I did this part two is the most gargantuan one-liner I've ever written. Unlike some I chose to solve part two through PIP even-odd ray casting. Thing's get funny when a point shares a coordinate with both vertices of an edge. |
-| [11](AdventOfCode2023/Day11.cs) | ⚫ |  |
+| [11](AdventOfCode2023/Day11.cs) | 🟢 | Again made use of my point class today, as well as a very helpful [combinations method](https://stackoverflow.com/a/33336576/13361257) to find all n(n+1)/2 different pairs of galaxies. |
 | [12](AdventOfCode2023/Day12.cs) | ⚫ |  |
 | [13](AdventOfCode2023/Day13.cs) | ⚫ |  |
 | [14](AdventOfCode2023/Day14.cs) | ⚫ |  |
