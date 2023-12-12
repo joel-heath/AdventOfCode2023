@@ -19,15 +19,13 @@ public class Day12 : IDay
     };
     public Dictionary<string, string> UnitTestsP2 => new()
     {
-        {
-            "TestInput1",
-            "ExpectedOutput1"
-        },
-
+        { "???.### 1,1,3\r\n.??..??...?##. 1,1,3\r\n?#?#?#?#?#?#?#? 1,3,1,6\r\n????.#...#... 4,1,1\r\n????.######..#####. 1,6,5\r\n?###???????? 3,2,1", "525152" }
     };
 
-    public static long CountArrangements(string line, long[] contiguous, int i = 0, int index = 0, long remaining = -1, bool currentlyHashes = false)
+    public static long CountArrangements(string line, long[] contiguous, Dictionary<(int, int, long, bool), long> memo, int i = 0, int index = 0, long remaining = -1, bool currentlyHashes = false)
     {
+        if (memo.TryGetValue((i, index, remaining, currentlyHashes), out var arrangements)) return arrangements;
+
         remaining = remaining < 0 ? contiguous[index] : remaining;
         for (; i < line.Length; i++)
         {
@@ -48,7 +46,7 @@ public class Day12 : IDay
             {
                 long options = 0;
                 if (remaining > 0) // try #
-                    options += CountArrangements(line, contiguous, i + 1, index, remaining - 1, true);
+                    options += CountArrangements(line, contiguous, memo, i + 1, index, remaining - 1, true);
 
                 if (!currentlyHashes || remaining == 0) // try .
                 {
@@ -62,10 +60,9 @@ public class Day12 : IDay
                             newRemaining = contiguous[newIndex];
                         }
                     }
-                    options += CountArrangements(line, contiguous, i + 1, newIndex, newRemaining);
+                    options += CountArrangements(line, contiguous, memo, i + 1, newIndex, newRemaining);
                 }
-                
-
+                memo[(i, index, remaining, currentlyHashes)] = options;
                 return options;
             }
 
@@ -79,39 +76,19 @@ public class Day12 : IDay
             }
         }
 
-        if (index < contiguous.Length) return 0;
-
-        return 1;
+        var answer = index < contiguous.Length ? 0 : 1;
+        memo[(i, index, remaining, currentlyHashes)] = answer;
+        return answer;
     }
-
 
     public string SolvePart1(string input)
-    {
-        long total = 0;
-
-        var lines = input.Split(Environment.NewLine);
-        for (int i = 0; i < lines.Length; i++)
-        {
-            var data = lines[i].Split(' ');
-            
-            var goal = data[1].Split(',').Select(long.Parse).ToArray();
-            var line = data[0] + '.';
-
-            //var contiguous = line[1].Split(',').Select(long.Parse).ToArray();
-            //var strings = line[0].Split('.').Where(l => l != string.Empty).Select(s => s.RLE().ToArray()).ToArray();
-
-            total += CountArrangements(line, goal);
-        }
-
-
-        return $"{total}";
-    }
+        => $"{input.Split(Environment.NewLine).Sum(l =>
+            new string[][] { l.Split(' ') }
+                .Sum(d => CountArrangements(d[0] + '.', d[1].Split(',').Select(long.Parse).ToArray(), [])))}";
 
     public string SolvePart2(string input)
-    {
-
-
-
-        return string.Empty;
-    }
+        => $"{input.Split(Environment.NewLine).Sum(l =>
+            new string[][] { l.Split(' ') }
+                .Sum(d => CountArrangements(string.Join('?', Enumerable.Repeat(d[0], 5)) + '.',
+                    Enumerable.Repeat(d[1].Split(',').Select(long.Parse).ToArray(), 5).SelectMany(n => n).ToArray(), [])))}";
 }
