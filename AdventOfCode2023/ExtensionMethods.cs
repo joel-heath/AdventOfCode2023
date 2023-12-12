@@ -7,6 +7,29 @@ public static class ExtensionMethods
         return input;
     }
 
+    public static IEnumerable<(T, long)> RLE<T>(this IEnumerable<T> source)
+    {
+        var enumerator = source.GetEnumerator();
+        if (!enumerator.MoveNext()) yield break;
+
+        var curr = enumerator.Current;
+        long count = 1;
+        while (enumerator.MoveNext())
+        {
+            if (enumerator.Current.Equals(curr))
+            {
+                count++;
+            }
+            else
+            {
+                yield return (curr, count);
+                count = 1;
+                curr = enumerator.Current;
+            }
+        }
+        yield return (curr, count);
+    }
+
     public static T[][] Transpose<T>(this IEnumerable<IEnumerable<T>> source)
         => source.SelectMany(inner => inner.Select((item, index) => new { item, index }))
             .GroupBy(i => i.index, i => i.item)
