@@ -25,60 +25,75 @@ public class Day12 : IDay
     public static long CountArrangements(string line, long[] contiguous, Dictionary<(int, int, long, bool), long> memo, int i = 0, int index = 0, long remaining = -1, bool currentlyHashes = false)
     {
         if (memo.TryGetValue((i, index, remaining, currentlyHashes), out var arrangements)) return arrangements;
-
         remaining = remaining < 0 ? contiguous[index] : remaining;
+
+        line.Skip(i).Aggregate(-1, (acc, current) => 
+
+            new long[] {
+                current == '#'
+                ? ((remaining-- == 0) == (currentlyHashes = true)) ? 0 : acc
+                :
+            current == '.'
+                ? (currentlyHashes && remaining > 0 || (currentlyHashes = false)) ? 0 : acc
+                :
+                new long[] { (remaining > 0
+                            ? CountArrangements(line, contiguous, memo, i + 1, index, remaining - 1, true)
+                            : 0)
+                        + (!currentlyHashes || remaining == 0
+                            ? (CountArrangements(line, contiguous, memo, i + 1,
+                                remaining == 0
+                                    ? index + 1
+                                    : index,
+                                remaining == 0 && index + 1 < contiguous.Length
+                                    ? contiguous[index + 1]
+                                    : remaining))
+                            : 0)}
+                    .Sum(options => memo[(i, index, remaining, currentlyHashes)] = options) }
+
+            if ((!currentlyHashes && remaining == 0) && (++index < contiguous.Length)) remaining = contiguous[index];
+        })
+
+        return memo[(i, index, remaining, currentlyHashes)] = index < contiguous.Length ? 0 : 1;
+    }
+
+    public static long CountArrangementsBackup(string line, long[] contiguous, Dictionary<(int, int, long, bool), long> memo, int i = 0, int index = 0, long remaining = -1, bool currentlyHashes = false)
+    {
+        if (memo.TryGetValue((i, index, remaining, currentlyHashes), out var arrangements)) return arrangements;
+        remaining = remaining < 0 ? contiguous[index] : remaining;
+
         for (; i < line.Length; i++)
         {
             var current = line[i];
 
             if (current == '#')
             {
-                currentlyHashes = true;
-                if (remaining == 0) return 0;
-                remaining--;
+                if ((remaining-- == 0) == (currentlyHashes = true)) return 0;
             }
             else if (current == '.')
             {
-                if (currentlyHashes && remaining > 0) return 0;
-                currentlyHashes = false;
+                if (currentlyHashes && remaining > 0 || (currentlyHashes = false)) return 0;
             }
-            else // ?
+            else
             {
-                long options = 0;
-                if (remaining > 0) // try #
-                    options += CountArrangements(line, contiguous, memo, i + 1, index, remaining - 1, true);
-
-                if (!currentlyHashes || remaining == 0) // try .
-                {
-                    var newIndex = index;
-                    var newRemaining = remaining;
-                    if (newRemaining == 0)
-                    {
-                        newIndex++;
-                        if (newIndex < contiguous.Length)
-                        {
-                            newRemaining = contiguous[newIndex];
-                        }
-                    }
-                    options += CountArrangements(line, contiguous, memo, i + 1, newIndex, newRemaining);
-                }
-                memo[(i, index, remaining, currentlyHashes)] = options;
-                return options;
+                return new long[] { (remaining > 0
+                            ? CountArrangements(line, contiguous, memo, i + 1, index, remaining - 1, true)
+                            : 0)
+                        + (!currentlyHashes || remaining == 0
+                            ? (CountArrangements(line, contiguous, memo, i + 1,
+                                remaining == 0
+                                    ? index + 1
+                                    : index,
+                                remaining == 0 && index + 1 < contiguous.Length
+                                    ? contiguous[index + 1]
+                                    : remaining))
+                            : 0)}
+                    .Sum(options => memo[(i, index, remaining, currentlyHashes)] = options);
             }
 
-            if (!currentlyHashes && remaining == 0)
-            {
-                index++;
-                if (index < contiguous.Length)
-                {
-                    remaining = contiguous[index];
-                }
-            }
+            if ((!currentlyHashes && remaining == 0) && (++index < contiguous.Length)) remaining = contiguous[index];
         }
 
-        var answer = index < contiguous.Length ? 0 : 1;
-        memo[(i, index, remaining, currentlyHashes)] = answer;
-        return answer;
+        return memo[(i, index, remaining, currentlyHashes)] = index < contiguous.Length ? 0 : 1;
     }
 
     public string SolvePart1(string input)
