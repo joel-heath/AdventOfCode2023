@@ -26,7 +26,7 @@ Since any one-liner calling another one-liner recursive function could be reduce
 | [9](AdventOfCode2023/Day09.cs) | 🟢 | Full one-liners today, which I was not expecting. I achieved it through using `Aggregate()` three times for part two. |
 | [10](AdventOfCode2023/Day10.cs) | 🟡 | Somehow I've written two one-liners with two class variables & a breadth-first search. I'm genuinely astonished I did this part two is the most gargantuan one-liner I've ever written. Unlike some I chose to solve part two through PIP even-odd ray casting. Thing's get funny when a point shares a coordinate with both vertices of an edge. |
 | [11](AdventOfCode2023/Day11.cs) | 🟢 | Again made use of my point class today, as well as a very helpful [combinations method](https://stackoverflow.com/a/33336576/13361257) to find all n(n+1)/2 different pairs of galaxies. |
-| [12](AdventOfCode2023/Day12.cs) | ⚫ |  |
+| [12](AdventOfCode2023/Day12.cs) | 🟢 | Solved part 2 like many with memoization. Today's I've reduced to a one liner, but it increases the runtime from less than a second to about a second and a half, so though I consider this a win as I got a one-liner, I will keep my many-lined solution. |
 | [13](AdventOfCode2023/Day13.cs) | ⚫ |  |
 | [14](AdventOfCode2023/Day14.cs) | ⚫ |  |
 | [15](AdventOfCode2023/Day15.cs) | ⚫ |  |

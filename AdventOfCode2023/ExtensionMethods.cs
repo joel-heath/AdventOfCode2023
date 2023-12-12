@@ -9,7 +9,7 @@ public static class ExtensionMethods
 
     public static IEnumerable<(T, long)> RLE<T>(this IEnumerable<T> source)
     {
-        var enumerator = source.GetEnumerator();
+        using var enumerator = source.GetEnumerator();
         if (!enumerator.MoveNext()) yield break;
 
         var curr = enumerator.Current;
@@ -52,7 +52,7 @@ public static class ExtensionMethods
 
     public static IEnumerable<TSource> Scan<TSource>(this IEnumerable<TSource> source, Func<TSource, TSource, TSource> func)
     {
-        var enumerator = source.GetEnumerator();
+        using var enumerator = source.GetEnumerator();
         if (!enumerator.MoveNext()) throw new InvalidOperationException("Sequence contains no elements");
         TSource acc = enumerator.Current;
         acc = func(acc, enumerator.Current);
@@ -63,6 +63,27 @@ public static class ExtensionMethods
             acc = func(acc, enumerator.Current);
             yield return acc;
         }
+    }
+
+    public static T AggregateWhile<T>(this IEnumerable<T> src, Func<T, T, T> accumFn, Predicate<T> whileFn)
+    {
+        using var e = src.GetEnumerator();
+        if (!e.MoveNext())
+            throw new Exception("At least one element required by AggregateWhile");
+        var ans = e.Current;
+        while (whileFn(ans) && e.MoveNext())
+            ans = accumFn(ans, e.Current);
+        return ans;
+    }
+
+    public static TAccum AggregateWhile<TAccum, T>(this IEnumerable<T> src, TAccum seed, Func<TAccum, T, TAccum> accumFn, Predicate<TAccum> whileFn)
+    {
+        using var e = src.GetEnumerator();
+        if (!e.MoveNext()) return seed;
+        var ans = accumFn(seed, e.Current);
+        while (whileFn(ans) && e.MoveNext())
+            ans = accumFn(ans, e.Current);
+        return ans;
     }
 
     public static TAccumulate AggregateWhileAvailable<TSource, TAccumulate>(this IEnumerable<TSource> source, TAccumulate seed, Func<TAccumulate, TSource, TAccumulate> accumulator, Func<TAccumulate, TSource, IEnumerable<TSource>> feedback)
