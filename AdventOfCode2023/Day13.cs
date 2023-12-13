@@ -4,123 +4,27 @@ public class Day13 : IDay
     public int Day => 13;
     public Dictionary<string, string> UnitTestsP1 => new()
     {
-        {
-            "#.##..##.\r\n..#.##.#.\r\n##......#\r\n##......#\r\n..#.##.#.\r\n..##..##.\r\n#.#.##.#.\r\n\r\n#...##..#\r\n#....#..#\r\n..##..###\r\n#####.##.\r\n#####.##.\r\n..##..###\r\n#....#..#",
-            "405"
-        },
-
+        { "#.##..##.\r\n..#.##.#.\r\n##......#\r\n##......#\r\n..#.##.#.\r\n..##..##.\r\n#.#.##.#.\r\n\r\n#...##..#\r\n#....#..#\r\n..##..###\r\n#####.##.\r\n#####.##.\r\n..##..###\r\n#....#..#", "405" }
     };
     public Dictionary<string, string> UnitTestsP2 => new()
     {
-        {
-            "#.##..##.\r\n..#.##.#.\r\n##......#\r\n##......#\r\n..#.##.#.\r\n..##..##.\r\n#.#.##.#.\r\n\r\n#...##..#\r\n#....#..#\r\n..##..###\r\n#####.##.\r\n#####.##.\r\n..##..###\r\n#....#..#",
-            "400"
-        },
-
+        { "#.##..##.\r\n..#.##.#.\r\n##......#\r\n##......#\r\n..#.##.#.\r\n..##..##.\r\n#.#.##.#.\r\n\r\n#...##..#\r\n#....#..#\r\n..##..###\r\n#####.##.\r\n#####.##.\r\n..##..###\r\n#....#..#", "400" }
     };
 
-    static bool IsLineOfReflection(char[][] input, int index)
-    {
-        for (int i = index, j = index + 1; i >= 0 && j < input.Length; i--, j++)
-        {
-            for (int k = 0; k < input[i].Length; k++)
-            {
-                if (input[i][k] != input[j][k]) return false;
-            }
-        }
-        return true;
-    }
+    public string SolvePart1(string input) => $"{Solve(input, smudgeRules: false)}";
+    
+    public string SolvePart2(string input) => $"{Solve(input, smudgeRules: true)}";
 
-    static long GetPatternScore(string pattern)
-    {
-        var lines = pattern.Split(Environment.NewLine).Select(l => l.ToCharArray()).ToArray();
+    private static long Solve(string input, bool smudgeRules)
+        => input.Split(Environment.NewLine + Environment.NewLine).Sum(pattern =>
+                new char[][][] { pattern.Split(Environment.NewLine).Select(l => l.ToCharArray()).ToArray() }
+                .Select(lines => (lines, lines.Take(lines.Length - 1).Select((l, i) => (100 * (i + 1), IsLineOfReflection(lines, i, smudgeRules))).FirstOrDefault(i => i.Item2)))
+                .Select(l => l.Item2.Item1 > 0 ? l.Item2.Item1
+                    : new char[][][] { l.lines.Transpose().Select(l => l.ToArray()).ToArray() }
+                        .Select(lines => lines.Take(lines.Length - 1).Select((l, i) => (i + 1, IsLineOfReflection(lines, i, smudgeRules))).First(i => i.Item2)).First().Item1).First());
 
-        for (int i = 0; i < lines.Length - 1; i++)
-        {
-            if (IsLineOfReflection(lines, i))
-            {
-                return 100 * (i + 1);
-            }
-        }
-        lines = lines.Transpose().Select(l => l.ToArray()).ToArray();
-        for (int i = 0; i < lines.Length - 1; i++)
-        {
-            if (IsLineOfReflection(lines, i))
-            {
-                return i+1;
-            }
-        }
+    private static bool IsLineOfReflection(IEnumerable<IEnumerable<char>> input, int index, bool smudgeRules, bool haveFoundSmudge = false)
+        => input.Take(index + 1).Reverse().Zip(input.Skip(index + 1))
+            .All(t => t.First.Zip(t.Second).All(c => c.First == c.Second || (smudgeRules && (haveFoundSmudge = !haveFoundSmudge)))) && (haveFoundSmudge || !smudgeRules);
 
-        throw new Exception();
-    }
-
-    static bool IsLineOfReflection2(char[][] input, int index)
-    {
-        bool haveFoundSmudge = false;
-        for (int i = index, j = index + 1; i >= 0 && j < input.Length; i--, j++)
-        {
-            for (int k = 0; k < input[i].Length; k++)
-            {
-                if (input[i][k] != input[j][k])
-                {
-                    if (haveFoundSmudge)
-                        return false;
-                    else
-                        haveFoundSmudge = true;
-                }
-            }
-        }
-        if (!haveFoundSmudge) return false;
-
-        return true;
-    }
-
-    static long GetPatternScore2(string pattern)
-    {
-        var lines = pattern.Split(Environment.NewLine).Select(l => l.ToCharArray()).ToArray();
-
-        for (int i = 0; i < lines.Length - 1; i++)
-        {
-            if (IsLineOfReflection2(lines, i))
-            {
-                return 100 * (i + 1);
-            }
-        }
-        lines = lines.Transpose().Select(l => l.ToArray()).ToArray();
-        for (int i = 0; i < lines.Length - 1; i++)
-        {
-            if (IsLineOfReflection2(lines, i))
-            {
-                return i + 1;
-            }
-        }
-
-        throw new Exception();
-    }
-
-    public string SolvePart1(string input)
-    {
-        long total = 0;
-
-        var patterns = input.Split(Environment.NewLine + Environment.NewLine);
-        for (int i = 0; i < patterns.Length; i++)
-        {
-            total += GetPatternScore(patterns[i]);
-        }
-
-        return $"{total}";
-    }
-
-    public string SolvePart2(string input)
-    {
-        long total = 0;
-
-        var patterns = input.Split(Environment.NewLine + Environment.NewLine);
-        for (int i = 0; i < patterns.Length; i++)
-        {
-            total += GetPatternScore2(patterns[i]);
-        }
-
-        return $"{total}";
-    }
 }

@@ -1,3 +1,5 @@
+using System.Net;
+
 namespace AdventOfCode2023;
 public class Day05 : IDay
 {
@@ -34,7 +36,7 @@ public class Day05 : IDay
                         .Aggregate(i.seeds, (acc, m) => CalculateNewSeeds(acc.GetEnumerator(), m))
                         .Min(x => x.source)).First()}";
 
-    public IEnumerable<(long source, long range)> CalculateNewSeeds(IEnumerator<(long source, long range)> seeds, IEnumerable<(long destination, long source, long range)> mappings)
+    private static IEnumerable<(long source, long range)> CalculateNewSeeds(IEnumerator<(long source, long range)> seeds, IEnumerable<(long destination, long source, long range)> mappings)
         => (!seeds.MoveNext()) ? [] : new (long destination, long source, long range)[] { mappings.FirstOrDefault(m => !(seeds.Current.source + seeds.Current.range <= m.source || seeds.Current.source >= m.source + m.range)) }
             .SelectMany(m => m == (0, 0, 0)
                 ? new (long source, long range)[] { (seeds.Current.source, seeds.Current.range) }.Concat(CalculateNewSeeds(seeds, mappings))

@@ -33,7 +33,7 @@ public class Day12 : IDay
                 .Sum(d => CountArrangements(string.Join('?', Enumerable.Repeat(d[0], 5)) + '.',
                     Enumerable.Repeat(d[1].Split(',').Select(long.Parse).ToArray(), 5).SelectMany(n => n).ToArray(), [])))}";
 
-    public static long CountArrangements(string line, long[] contiguous, Dictionary<(int, int, long, bool), long> memo, int i = 0, int index = 0, long remaining = -1, bool currentlyHashes = false)
+    private static long CountArrangements(string line, long[] contiguous, Dictionary<(int, int, long, bool), long> memo, int i = 0, int index = 0, long remaining = -1, bool currentlyHashes = false)
     {
         if (memo.TryGetValue((i, index, remaining, currentlyHashes), out var arrangements)) return arrangements;
         remaining = remaining < 0 ? contiguous[index] : remaining;
@@ -73,7 +73,7 @@ public class Day12 : IDay
         return memo[(i, index, remaining, currentlyHashes)] = index < contiguous.Length ? 0 : 1;
     }
 
-    public static long OneLiner(string line, long[] contiguous, Dictionary<(int, int, long, bool), long> memo, int i = 0, int index = 0, long remaining = -1, bool currentlyHashes = false)
+    private static long OneLiner(string line, long[] contiguous, Dictionary<(int, int, long, bool), long> memo, int i = 0, int index = 0, long remaining = -1, bool currentlyHashes = false)
         => memo.TryGetValue((i, index, remaining = remaining < 0 ? contiguous[index] : remaining, currentlyHashes), out var arrangements) ? arrangements
             : new long[] {
             line.Select((c, i) => (c, i)).Skip(i).AggregateWhile(-1L, (acc, current) =>

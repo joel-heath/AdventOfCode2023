@@ -15,14 +15,6 @@ public partial class Day08 : IDay
         { "LR\r\n\r\n11A = (11B, XXX)\r\n11B = (XXX, 11Z)\r\n11Z = (11B, XXX)\r\n22A = (22B, XXX)\r\n22B = (22C, 22C)\r\n22C = (22Z, 22Z)\r\n22Z = (22B, 22B)\r\nXXX = (XXX, XXX)", "6" }
     };
 
-    public static long NodeFinder(string start, Dictionary<string, (string,string)> graph, string instructions, bool tripleZ)
-    {
-        long j = 0;
-        for (; tripleZ && start != "ZZZ" || !tripleZ && start[2] != 'Z'; j++)
-            start = new (string left, string right)[] { graph[start] }.Select(t => instructions[(int)(j % instructions.Length)] == 'L' ? t.left : t.right).First();
-        return j;
-    }
-
     public string SolvePart1(string input)
         => $"{new string[][] { input.Split(Environment.NewLine + Environment.NewLine) }.Select(lines =>
             NodeFinder("AAA", Node().Matches(lines[1]).SelectMany(m => m.Groups.Cast<Group>().Select(g => g.Captures[0].Value))
@@ -41,6 +33,14 @@ public partial class Day08 : IDay
                 .Select(c => NodeFinder(c, d.Item1, d.Item2, false))
                 .Aggregate(Utils.LCM))
             .First()}";
+
+    private static long NodeFinder(string start, Dictionary<string, (string, string)> graph, string instructions, bool tripleZ)
+    {
+        long j = 0;
+        for (; tripleZ && start != "ZZZ" || !tripleZ && start[2] != 'Z'; j++)
+            start = new (string left, string right)[] { graph[start] }.Select(t => instructions[(int)(j % instructions.Length)] == 'L' ? t.left : t.right).First();
+        return j;
+    }
 
     [GeneratedRegex(@"\w{3}")]
     private static partial Regex Node();

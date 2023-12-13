@@ -57,7 +57,7 @@ public class Day10 : IDay
                                         : (acc.Item1 + 1, (inp.grid[point] != '-' && inp.grid[point] != '|') ? inp.grid[point] : acc.Item2)
                                 ).Item1 % 2 == 1)) ? 1 : 0))).First()}";
 
-    static (HashSet<Point>, int) BFS(Point start, Grid<char> map)
+    private static(HashSet<Point>, int) BFS(Point start, Grid<char> map)
     {
         HashSet<Point> visited = [];
         Queue<(Point, int)> toVisit = new([(start, 0)]);

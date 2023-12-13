@@ -15,7 +15,7 @@ public class Day11 : IDay
 
     public string SolvePart2(string input) => $"{Solve(input, 1_000_000)}";
 
-    static long Solve(string input, int expansionFactor)
+    private static long Solve(string input, int expansionFactor)
         => new string[][] { input.Split(Environment.NewLine) }
             .Select(lines => new
             {
