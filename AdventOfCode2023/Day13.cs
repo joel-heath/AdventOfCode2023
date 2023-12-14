@@ -26,5 +26,4 @@ public class Day13 : IDay
     private static bool IsLineOfReflection(IEnumerable<IEnumerable<char>> input, int index, bool smudgeRules, bool haveFoundSmudge = false)
         => input.Take(index + 1).Reverse().Zip(input.Skip(index + 1))
             .All(t => t.First.Zip(t.Second).All(c => c.First == c.Second || (smudgeRules && (haveFoundSmudge = !haveFoundSmudge)))) && (haveFoundSmudge || !smudgeRules);
-
 }
