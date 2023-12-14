@@ -65,30 +65,32 @@ public class Grid<T>(int x, int y)
     {
         if (!IsInGrid(start)) yield break;
 
+        if (inclusive) yield return start;
+
         if (direction == 0) // North
         {
-            for (long i = inclusive ? start.Y : start.Y - 1; i >= 0; i--)
+            for (long i = start.Y - 1; i >= 0; i--)
             {
                 yield return (start.X, i);
             }
         }
         else if (direction == 2) // South
         {
-            for (long i = inclusive ? start.Y : start.Y + 1; i < Height; i++)
+            for (long i = start.Y + 1; i < Height; i++)
             {
                 yield return (start.X, i);
             }
         }
         else if (direction == 3) // West
         {
-            for (long i = inclusive ? start.X : start.X - 1; i >= 0; i--)
+            for (long i = start.X - 1; i >= 0; i--)
             {
                 yield return (i, start.Y);
             }
         }
         else if (direction == 1) // East
         {
-            for (long i = inclusive ? start.X : start.X + 1; i < Width; i++)
+            for (long i = start.X + 1; i < Width; i++)
             {
                 yield return (i, start.Y);
             }

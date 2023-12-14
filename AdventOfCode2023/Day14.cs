@@ -1,33 +1,17 @@
+using System;
+
 namespace AdventOfCode2023;
 public class Day14 : IDay
 {
     public int Day => 14;
     public Dictionary<string, string> UnitTestsP1 => new()
     {
-        {
-            "O....#....\r\nO.OO#....#\r\n.....##...\r\nOO.#O....O\r\n.O.....O#.\r\nO.#..O.#.#\r\n..O..#O..O\r\n.......O..\r\n#....###..\r\n#OO..#....",
-            "136"
-        },
-
+        { "O....#....\r\nO.OO#....#\r\n.....##...\r\nOO.#O....O\r\n.O.....O#.\r\nO.#..O.#.#\r\n..O..#O..O\r\n.......O..\r\n#....###..\r\n#OO..#....", "136" }
     };
     public Dictionary<string, string> UnitTestsP2 => new()
     {
-        {
-            "O....#....\r\nO.OO#....#\r\n.....##...\r\nOO.#O....O\r\n.O.....O#.\r\nO.#..O.#.#\r\n..O..#O..O\r\n.......O..\r\n#....###..\r\n#OO..#....",
-            "64"
-        },
-
+        { "O....#....\r\nO.OO#....#\r\n.....##...\r\nOO.#O....O\r\n.O.....O#.\r\nO.#..O.#.#\r\n..O..#O..O\r\n.......O..\r\n#....###..\r\n#OO..#....", "64" }
     };
-
-    public static Point Slide(Point location, Grid<char> map, int direction = 0)
-    {
-        var newLocation = map.LineOut(location, 0, false).TakeWhile(c => map[c] == '.').LastOrDefault(location);
-
-        map[location] = '.';
-        map[newLocation] = 'O';
-
-        return newLocation;
-    }
 
     public string SolvePart1(string input)
     {
@@ -51,115 +35,77 @@ public class Day14 : IDay
         return $"{total}";
     }
 
-    static int FindRepeat(List<Point[]> history, Point[] current)
-    {
-        for (int i = 0; i < history.Count; i++)
-        {
-            bool match = true;
-            var arr = history[i];
-            for (int j = 0; j < arr.Length; j++)
-            {
-                if (current[j] != arr[j])
-                { match = false; break; }
-            }
-
-            if (match)
-                return i;
-        }
-
-        return -1;
-    }
-
     public string SolvePart2(string input)
     {
         long total = 0;
 
-        var points = input.Split(Environment.NewLine).SelectMany((l, i) => l.Select((c, ci) => (new Point(ci, i), c))).ToArray();
-        var roundRocks = points.Where(p => p.c == 'O').Select(p => p.Item1).ToArray();
-        var squareRocks = points.Where(p => p.c == '#').Select(p => p.Item1).ToArray();
-        Point bounds = (points.Max(p => p.Item1.X), points.Max(p => p.Item1.Y));
+        var grid = new Grid<char>(input.Split(Environment.NewLine).Select(l => l.ToCharArray()).ToArray());
 
-        const int COUNT = 1_000_000_000;
-        //const int COUNT = 1;
-
-        var history = new List<Point[]>();
-        int i = 0;
+        List<string> history = [];
+        int cycles = 1_000_000_000;
         int lb = -1;
-        for (; i < COUNT; i++)
+        for ( ; cycles > 0; cycles--)
         {
-            for (int c = 0; c < 4; c++)
+            for (int x = 0; x < grid.Width; x++)
             {
-                roundRocks = c == 0
-                    ? roundRocks.OrderBy(r => r.Y).ToArray()
-                    : c == 1
-                        ? roundRocks.OrderBy(r => r.X).ToArray()
-                        : c == 2
-                            ? roundRocks.OrderByDescending(r => r.Y).ToArray()
-                            : roundRocks.OrderByDescending(r => r.X).ToArray();
-
-                for (int j = 0; j < roundRocks.Length; j++)
+                for (int y = 0; y < grid.Height; y++)
                 {
-                    var newLocation = FindNewLocation(roundRocks[j], c, roundRocks, squareRocks, bounds);
-                    roundRocks[j] = newLocation;
+                    if (grid[(x, y)] == 'O')
+                    {
+                        Slide((x, y), grid, 0);
+                    }
+                }
+            }
+            for (int x = 0; x < grid.Width; x++)
+            {
+                for (int y = 0; y < grid.Height; y++)
+                {
+                    if (grid[(x, y)] == 'O')
+                    {
+                        Slide((x, y), grid, 3);
+                    }
+                }
+            }
+            for (int x = 0; x < grid.Width; x++)
+            {
+                for (int y = grid.Height - 1; y >= 0; y--)
+                {
+                    if (grid[(x, y)] == 'O')
+                    {
+                        Slide((x, y), grid, 2);
+                    }
+                }
+            }
+            for (int x = grid.Width - 1; x >= 0; x--)
+            {
+                for (int y = 0; y < grid.Height; y++)
+                {
+                    if (grid[(x, y)] == 'O')
+                    {
+                        Slide((x, y), grid, 1);
+                    }
                 }
             }
 
-            lb = FindRepeat(history, roundRocks);
+            var locations = grid.ToString();
+            lb = history.IndexOf(locations);
             if (lb > -1) break;
-
-            history.Add(roundRocks);
+            history.Add(locations);
         }
 
-        var remaining = COUNT - i - 1;
-        var repeatingGroup = history[lb..];
+        var cycle = history[lb..];
+        var finalGrid = cycle[(cycles - 1) % cycle.Count];
 
-        roundRocks = repeatingGroup[remaining % repeatingGroup.Count];
-
-        
-
-        return $"{roundRocks.Sum(r => bounds.Y + 1 - r.Y)}";
+        return $"{finalGrid.Split(Environment.NewLine).Reverse().SelectMany((l, i) => l.Select(c => (c, i))).Where(c => c.c == 'O').Sum(r => r.i).Dump()}";
     }
 
-    public static void VisualiseRocks(Point[] round, Point[] square, Point bounds)
+    public static Point Slide(Point location, Grid<char> map, int direction = 0)
     {
-        var (left, top) = Console.GetCursorPosition();
+        var newLocation = map.LineOut(location, direction, false).TakeWhile(c => map[c] == '.').LastOrDefault(location);
 
-        for (int y = 0; y <= bounds.Y; y++)
-        {
-            for (int x = 0; x <= bounds.X; x++)
-            {
-                Console.SetCursorPosition(left + x, top + y);
-                Console.Write('.');
-            }
-        }
+        map[location] = '.';
+        map[newLocation] = 'O';
 
-        foreach (var item in round)
-        {
-            Console.SetCursorPosition(left + (int)item.X, top + (int)item.Y);
-            Console.Write('O');
-        }
-        foreach (var item in square)
-        {
-            Console.SetCursorPosition(left + (int)item.X, top + (int)item.Y);
-            Console.Write('#');
-        }
-        Console.SetCursorPosition(left, top + (int)bounds.Y + 2);
-    }
-
-    public static Point FindNewLocation(Point start, int direction, Point[] round, Point[] square, Point bounds)
-    {
-        var dVector = direction == 0 ? (0, -1) : direction == 1 ? (-1, 0) : direction == 2 ? (0, 1) : (1, 0);
-
-        var location = start;
-        while (true)
-        {
-            var newLocation = location + dVector;
-            if (square.Contains(newLocation) || round.Contains(newLocation)
-                || newLocation.X > bounds.X || newLocation.Y > bounds.Y
-                || newLocation.X < 0 || newLocation.Y < 0) break;
-            location = newLocation;
-        }
-
-        return location;
+        return newLocation;
     }
 }
