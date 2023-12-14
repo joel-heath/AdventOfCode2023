@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Reflection.PortableExecutable;
+using System.Text;
 
 namespace AdventOfCode2023;
 public class Grid<T>(int x, int y)
@@ -30,6 +31,18 @@ public class Grid<T>(int x, int y)
             for (int c = 0; c < Width; c++)
             {
                 points[c, r] = transpose ? contents[r][c] : contents[c][r];
+            }
+        }
+    }
+    public Grid(int width, int height, IEnumerable<T> contents) : this(width, height)
+    {
+        var enumerator = contents.GetEnumerator();
+        for (int x = 0; x < Width; x++)
+        {
+            for (int y = 0; y < Height; y++)
+            {
+                enumerator.MoveNext();
+                this[x, y] = enumerator.Current;
             }
         }
     }

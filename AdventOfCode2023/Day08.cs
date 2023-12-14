@@ -35,12 +35,10 @@ public partial class Day08 : IDay
             .First()}";
 
     private static long NodeFinder(string start, Dictionary<string, (string, string)> graph, string instructions, bool tripleZ)
-    {
-        long j = 0;
-        for (; tripleZ && start != "ZZZ" || !tripleZ && start[2] != 'Z'; j++)
-            start = new (string left, string right)[] { graph[start] }.Select(t => instructions[(int)(j % instructions.Length)] == 'L' ? t.left : t.right).First();
-        return j;
-    }
+        => Utils.EnumerateForever(new object()).AggregateWhile(0L, (i, _) =>
+            (start = new (string left, string right)[] { graph[start] }.Select(t => instructions[(int)(i % instructions.Length)] == 'L' ? t.left : t.right).First())
+                == start ? i + 1 : i + 1,
+                    _ => tripleZ && start != "ZZZ" || !tripleZ && start[2] != 'Z');
 
     [GeneratedRegex(@"\w{3}")]
     private static partial Regex Node();

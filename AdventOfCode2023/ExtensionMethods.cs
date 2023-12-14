@@ -76,7 +76,7 @@ public static class ExtensionMethods
         return ans;
     }
 
-    public static TAccum AggregateWhile<TAccum, T>(this IEnumerable<T> src, TAccum seed, Func<TAccum, T, TAccum> accumFn, Predicate<TAccum> whileFn)
+    public static TAccum AggregateWhile<TAccum, TSource>(this IEnumerable<TSource> src, TAccum seed, Func<TAccum, TSource, TAccum> accumFn, Predicate<TAccum> whileFn)
     {
         using var e = src.GetEnumerator();
         if (!e.MoveNext()) return seed;
