@@ -4,19 +4,11 @@ public class Day15 : IDay
     public int Day => 15;
     public Dictionary<string, string> UnitTestsP1 => new()
     {
-        {
-            "rn=1,cm-,qp=3,cm=2,qp-,pc=4,ot=9,ab=5,pc-,pc=6,ot=7",
-            "1320"
-        },
-
+        { "rn=1,cm-,qp=3,cm=2,qp-,pc=4,ot=9,ab=5,pc-,pc=6,ot=7", "1320" }
     };
     public Dictionary<string, string> UnitTestsP2 => new()
     {
-        {
-            "rn=1,cm-,qp=3,cm=2,qp-,pc=4,ot=9,ab=5,pc-,pc=6,ot=7",
-            "145"
-        },
-
+        { "rn=1,cm-,qp=3,cm=2,qp-,pc=4,ot=9,ab=5,pc-,pc=6,ot=7", "145" }
     };
 
     public string SolvePart1(string input)
@@ -45,9 +37,8 @@ public class Day15 : IDay
 
     public string SolvePart2(string input)
     {
-        var hashmap = new Dictionary<long, List<(string, long)>>();
+        var hashmap = new List<(string, int)>[256];
 
-        
         var lines = input.Split(',');
         for (int i = 0; i < lines.Length; i++)
         {            
@@ -60,48 +51,31 @@ public class Day15 : IDay
                 hash *= 17;
                 hash %= 256;
             }
-
-            List<(string, long)> box = [];
-            if (hashmap.TryGetValue(hash, out var oldbox))
-            {
-                box = oldbox;
-            }
-            hashmap[hash] = box;
+            var box = hashmap[hash] ?? (hashmap[hash] = []);
 
             if (line.Contains('='))
             {
                 var data = line.Split('=');
-                //var label = data[0];
-                var focalLength = long.Parse(data[1]);
+                var focalLength = int.Parse(data[1]);
 
-                try
-                {
-                    var index = box.Select((l, i) => (l, i)).First(l => l.l.Item1 == label).i;
-                    box[index] = (label, focalLength);
-                }
-                catch
-                {
-                    box.Add((label, focalLength));
-                }
+                var index = box.Select((l, i) => (l, i)).FirstOrDefault(l => l.Item1.Item1 == label, (("", 0), -1)).Item2;
+                if (index == -1) box.Add((label, focalLength));
+                else box[index] = (label, focalLength);
             }
             else
             {
-                //var label = line[..^1];
-
-                try
-                {
-                    box.Remove(box.First(l => l.Item1 == label));
-                }
-                catch { }
+                box.Remove(box.FirstOrDefault(l => l.Item1 == label));
             }
         }
 
         long total = 0;
-        foreach (var kvp in hashmap)
+
+        for (int i = 0; i < hashmap.Length; i++)
         {
-            for (int i = 0; i < kvp.Value.Count; i++)
+            if (hashmap[i] is null) continue;
+            for (int j = 0; j < hashmap[i].Count; j++)
             {
-                total += (kvp.Key + 1) * (i + 1) * (kvp.Value[i].Item2);
+                total += (i + 1) * (j + 1) * hashmap[i][j].Item2;
             }
         }
 
