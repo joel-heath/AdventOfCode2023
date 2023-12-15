@@ -29,7 +29,7 @@ Since any one-liner calling another one-liner recursive function could be reduce
 | [12](AdventOfCode2023/Day12.cs) | 🟢 | Solved part 2 like many with memoization. Today's I've reduced to a one liner, but it increases the runtime from less than a second to about a second and a half, so though I consider this a win as I got a one-liner, I will keep my many-lined solution. |
 | [13](AdventOfCode2023/Day13.cs) | 🟢 | Pretty nice part one & two, perfect for multiple use of LINQ's `All()` for part two I used the exact same code, but it stores whether it's found a smudge (an error), then if it finds a second one it returns false. |
 | [14](AdventOfCode2023/Day14.cs) | 🟢 | Today's is (as is typical from myself) using impure LINQ methods with some very questionable approaches to forcing evaluation. My solution is `x => x.ToArray().Length == 0`, so the compiler can't cut any corners and has to evaluate every element of the array. |
-| [15](AdventOfCode2023/Day15.cs) | ⚫ |  |
+| [15](AdventOfCode2023/Day15.cs) | 🟢 | A very simple part one following a primitive hashing algorithm, part two introduces some new features, but nothing aggregation can't handle. |
 | [16](AdventOfCode2023/Day16.cs) | ⚫ |  |
 | [17](AdventOfCode2023/Day17.cs) | ⚫ |  |
 | [18](AdventOfCode2023/Day18.cs) | ⚫ |  |

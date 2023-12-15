@@ -1,3 +1,5 @@
+using System.Linq;
+
 namespace AdventOfCode2023;
 public class Day15 : IDay
 {
@@ -12,73 +14,19 @@ public class Day15 : IDay
     };
 
     public string SolvePart1(string input)
-    {
-        long total = 0;
-
-        var lines = input.Split(',');
-        for (int i = 0; i < lines.Length; i++)
-        {
-            long hash = 0;
-            var line = lines[i];
-
-            for (int j = 0; j < line.Length; j++)
-            {
-                hash += line[j];
-                hash *= 17;
-                hash %= 256;
-            }
-
-            total += hash;
-        }
-
-
-        return $"{total}";
-    }
+        => $"{input.Split(',').Sum(l => l.Aggregate(0, (hash, c) => (hash + c) * 17 % 256))}";
 
     public string SolvePart2(string input)
-    {
-        var hashmap = new List<(string, int)>[256];
-
-        var lines = input.Split(',');
-        for (int i = 0; i < lines.Length; i++)
-        {            
-            var line = lines[i];
-            var label = string.Concat(line.TakeWhile(c => c != '-' && c != '='));
-            long hash = 0;
-            for (int j = 0; j < label.Length; j++)
-            {
-                hash += label[j];
-                hash *= 17;
-                hash %= 256;
-            }
-            var box = hashmap[hash] ?? (hashmap[hash] = []);
-
-            if (line.Contains('='))
-            {
-                var data = line.Split('=');
-                var focalLength = int.Parse(data[1]);
-
-                var index = box.Select((l, i) => (l, i)).FirstOrDefault(l => l.Item1.Item1 == label, (("", 0), -1)).Item2;
-                if (index == -1) box.Add((label, focalLength));
-                else box[index] = (label, focalLength);
-            }
-            else
-            {
-                box.Remove(box.FirstOrDefault(l => l.Item1 == label));
-            }
-        }
-
-        long total = 0;
-
-        for (int i = 0; i < hashmap.Length; i++)
-        {
-            if (hashmap[i] is null) continue;
-            for (int j = 0; j < hashmap[i].Count; j++)
-            {
-                total += (i + 1) * (j + 1) * hashmap[i][j].Item2;
-            }
-        }
-
-        return $"{total}";
-    }
+        => $"{input.Split(',').Select(l => l.Split('=')).Select(l => l.Length == 2 ? (l[0], int.Parse(l[1])) : (l[0][..^1], 0))
+            .Select<(string label, int focalLength), (string label, int focalLength, int hash)>(l => (l.label, l.focalLength, l.label.Aggregate(0, (hash, c) => (hash + c) * 17 % 256)))
+            .Aggregate(new List<(string, int)>[256], (hashmap, line) =>
+                (hashmap[line.hash] = (new List<(string, int)>[] { hashmap[line.hash] ?? (hashmap[line.hash] = []) }
+                    .Select(box =>
+                        line.focalLength > 0
+                            ? new int[] { box.Select((l, i) => (l, i)).FirstOrDefault(l => l.Item1.Item1 == line.label, (("", 0), -1)).Item2 }
+                                .Select(index => index == -1 ? [.. box, (line.label, line.focalLength)] : (box[index] = (line.label, line.focalLength)) == default ? box : box)
+                                .First()
+                            : box.Remove(box.FirstOrDefault(l => l.Item1 == line.label)) ? box : box))
+                    .First()) == default ? hashmap : hashmap)
+            .Select((b, i) => b is null ? 0 : b.Select((l, j) => (i + 1) * (j + 1) * l.Item2).Sum()).Sum()}";
 }
