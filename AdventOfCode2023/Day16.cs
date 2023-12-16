@@ -4,116 +4,38 @@ public class Day16 : IDay
     public int Day => 16;
     public Dictionary<string, string> UnitTestsP1 => new()
     {
-        {
-            ".|...\\....\r\n|.-.\\.....\r\n.....|-...\r\n........|.\r\n..........\r\n.........\\\r\n..../.\\\\..\r\n.-.-/..|..\r\n.|....-|.\\\r\n..//.|....",
-            "46"
-        },
-
+        { ".|...\\....\r\n|.-.\\.....\r\n.....|-...\r\n........|.\r\n..........\r\n.........\\\r\n..../.\\\\..\r\n.-.-/..|..\r\n.|....-|.\\\r\n..//.|....", "46" }
     };
     public Dictionary<string, string> UnitTestsP2 => new()
     {
-        {
-            ".|...\\....\r\n|.-.\\.....\r\n.....|-...\r\n........|.\r\n..........\r\n.........\\\r\n..../.\\\\..\r\n.-.-/..|..\r\n.|....-|.\\\r\n..//.|....",
-            "51"
-        },
-
+        { ".|...\\....\r\n|.-.\\.....\r\n.....|-...\r\n........|.\r\n..........\r\n.........\\\r\n..../.\\\\..\r\n.-.-/..|..\r\n.|....-|.\\\r\n..//.|....", "51" }
     };
 
     private static readonly Point[] vectors = [(0, -1), (1, 0), (0, 1), (-1, 0)];
 
-    private static HashSet<(Point, int)> memo = [];
-
-    public HashSet<Point> TrackBeam(Grid<char> map, Point location, int direction, HashSet<Point>? points = null)
-    {
-        points ??= [];
-        if (memo.Contains((location, direction))) return points;
-
-        while (map.IsInGrid(location))
-        {
-            points.Add(location);
-            var symbol = map[location];
-
-            //(location).Dump();
-            memo.Add((location, direction));
-
-            if (symbol == '\\' || symbol == '/')
-            {
-                if (direction == 0)
-                {
-                    if (symbol == '\\') direction = 3;
-                    else direction = 1;
-                }
-                else if (direction == 1)
-                {
-                    if (symbol == '\\') direction = 2;
-                    else direction = 0;
-                }
-                else if (direction == 2)
-                {
-                    if (symbol == '\\') direction = 1;
-                    else direction = 3;
-                }
-                else if (direction == 3)
-                {
-                    if (symbol == '\\') direction = 0;
-                    else direction = 2;
-                }
-            }
-            else if (symbol == '|' || symbol == '-')
-            {
-                if (!(((direction == 0 || direction == 2) && symbol == '|')
-                    || ((direction == 1 || direction == 3) && symbol == '-')))
-                {
-                    if (symbol == '|')
-                    {
-                        TrackBeam(map, location + (0, -1), 0, points);
-                        TrackBeam(map, location + (0, 1), 2, points);
-                    }
-                    else
-                    {
-                        TrackBeam(map, location + (1, 0), 1, points);
-                        TrackBeam(map, location + (-1, 0), 3, points);
-                    }
-                    return points;
-                }
-            }
-
-            location += vectors[direction];
-        }
-
-        return points;
-    }
-
     public string SolvePart1(string input)
-    {
-        long total = 0;
-        memo = [];
-        var grid = new Grid<char>(input.Split(Environment.NewLine).Select(l => l.ToCharArray()).ToArray());
-
-        return $"{TrackBeam(grid, (0, 0), 1).Count}";
-    }
+        => $"{TrackBeam(new Grid<char>(input.Split(Environment.NewLine).Select(l => l.ToCharArray()).ToArray()), (0, 0), 1).Count}";
 
     public string SolvePart2(string input)
-    {
-        var grid = new Grid<char>(input.Split(Environment.NewLine).Select(l => l.ToCharArray()).ToArray());
+        => $"{new Grid<char>[] { new(input.Split(Environment.NewLine).Select(l => l.ToCharArray()).ToArray()) }.Select(grid => 
+            Enumerable.Range(0, grid.Height).SelectMany(i => new (int x, int y, int d)[] { (i, 0, 2), (i, grid.Height - 1, 0) })
+            .Concat(Enumerable.Range(0, grid.Width).SelectMany(i => new (int x, int y, int d)[] { (0, i, 1), (grid.Width - 1, i, 3) }))
+            .Max(i => TrackBeam(grid, (i.x, i.y), i.d).Count)).First()}";
 
-        int max = 0;
-        for (int i = 0; i < grid.Height; i++)
-        {
-            memo = [];
-            max = Math.Max(max, TrackBeam(grid, (i, 0), 2).Count);
-            memo = [];
-            max = Math.Max(max, TrackBeam(grid, (i, grid.Height - 1), 0).Count);
-        }
-        for (int i = 0; i < grid.Width; i++)
-        {
-
-            memo = [];
-            max = Math.Max(max, TrackBeam(grid, (0, i), 1).Count);
-            memo = [];
-            max = Math.Max(max, TrackBeam(grid, (grid.Width - 1, i), 3).Count);
-        }
-
-        return $"{max}";
-    }
+    public HashSet<Point> TrackBeam(Grid<char> map, Point location, int direction, HashSet<Point>? points = null, HashSet<(Point, int)>? memo = null)
+    => new (HashSet<Point>, HashSet<(Point, int)>)[] { (points ??= [], memo ??= []) }.Select(_ =>
+        memo.Contains((location, direction)) || !map.IsInGrid(location) ? points :
+            Utils.EnumerateForever(new object()).TakeWhile(_ =>
+                new char[] { points.Add(location) && false || memo.Add((location, direction)) ? map[location] : map[location] }.Select(symbol =>
+                    symbol == '\\' || symbol == '/'
+                        ? (direction = symbol == '\\' ? direction = 4 - direction - 1 : direction + (int)Math.Pow(-1, direction)) == -1 || true
+                        : (symbol != '|' || direction % 2 != 1) && (symbol != '-' || direction % 2 != 0)
+                            || (symbol == '|'
+                                ? TrackBeam(map, location + (0, -1), 0, points, memo).Count == -1 ||
+                                   TrackBeam(map, location + (0, 1), 2, points, memo).Count == -1
+                                : TrackBeam(map, location + (1, 0), 1, points, memo).Count == -1 ||
+                                   TrackBeam(map, location + (-1, 0), 3, points, memo).Count == -1))
+                    .Select(b => b && (location += vectors[direction]) != (-1, -1))
+                    .First() && map.IsInGrid(location)
+                    ).ToArray().Length == 1 ? points : points).First();
 }
