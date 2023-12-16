@@ -1,7 +1,3 @@
-using System.ComponentModel;
-using System.Runtime.InteropServices;
-using System.Xml.Linq;
-
 namespace AdventOfCode2023;
 public class Day10 : IDay
 {
@@ -48,18 +44,15 @@ public class Day10 : IDay
                     Enumerable.Range(0, inp.grid.Width)
                         .Sum(x => 
                         (!inp.loop.Contains((x, y)) &&
-                            Enumerable.Range(0, 4).Any(i =>
-                            inp.grid.LineOut((x, y), i, false).Where(p => inp.loop.Contains(p) && ((i == 0 || i == 2) ? inp.grid[p] != '|' : inp.grid[p] != '-'))
+                            inp.grid.LineOut((x, y), 0, false).Where(p => inp.loop.Contains(p) && inp.grid[p] != '|')
                                 .Aggregate((0, (char)0), (acc, point) =>
                                     (acc.Item2 != (char)0)
-                                        ? (acc.Item1 + (((i == 1 || i == 3)
-                                            ? (acc.Item2 == 'F' && inp.grid[point] == '7' || acc.Item2 == '7' && inp.grid[point] == 'F'
-                                                || acc.Item2 == 'L' && inp.grid[point] == 'J' || acc.Item2 == 'J' && inp.grid[point] == 'L')
-                                            : (acc.Item2 == 'F' && inp.grid[point] == 'L' || acc.Item2 == 'L' && inp.grid[point] == 'F'
-                                                || acc.Item2 == '7' && inp.grid[point] == 'J' || acc.Item2 == 'J' && inp.grid[point] == '7')) ? 1 : 0),
+                                        ? (acc.Item1 + ((
+                                            (acc.Item2 == 'F' && inp.grid[point] == 'L' || acc.Item2 == 'L' && inp.grid[point] == 'F'
+                                            || acc.Item2 == '7' && inp.grid[point] == 'J' || acc.Item2 == 'J' && inp.grid[point] == '7')) ? 1 : 0),
                                                 (char)0)
                                         : (acc.Item1 + 1, (inp.grid[point] != '-' && inp.grid[point] != '|') ? inp.grid[point] : acc.Item2)
-                                ).Item1 % 2 == 1)) ? 1 : 0))).First()}";
+                                ).Item1 % 2 == 1) ? 1 : 0))).First()}";
 
     private static (HashSet<Point>, int) BFS(Point start, Grid<char> map)
     {
