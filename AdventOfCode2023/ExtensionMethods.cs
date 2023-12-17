@@ -105,4 +105,10 @@ public static class ExtensionMethods
 
         return acc;
     }
+
+    public static bool InvokeTruthfully(this Action action)
+    {
+        action.Invoke();
+        return true;
+    }
 }

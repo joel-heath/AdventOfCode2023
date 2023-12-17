@@ -14,124 +14,28 @@ public class Day17 : IDay
 
     private static readonly Point[] vectors = [(0, -1), (1, 0), (0, 1), (-1, 0)];
 
-    public static long FindShortestPath(Grid<int> map, Point start, Point goal)
-    {
-        var min = long.MaxValue;
-
-        //Dictionary<(Point, int, int), long> visited = new();
-        HashSet<(Point, int, int)> visited = new();
-        PriorityQueue<(Point loc, long dist, int dir, int str), long> queue = new([((start, 0, 1, 1), 0)]);
-
-        while (queue.TryDequeue(out var result, out _))
-        {
-            if (result.dist >= min) continue;
-            if (result.loc == goal)
-            {
-                min = Math.Min(min, result.dist);
-                //Console.WriteLine(min);
-                continue;
-            }
-            if (visited.Contains((result.loc, result.dir, result.str))) continue;
-            visited.Add((result.loc, result.dir, result.str));
-
-            //left
-            {
-                var newDir = (result.dir + 3) % 4;
-                var newPoint = result.loc + vectors[newDir];
-                if (map.Contains(newPoint))
-                {
-                    queue.Enqueue((newPoint, result.dist + map[newPoint], newDir, 1), result.dist);
-                }
-            }
-
-            // right
-            {
-                var newDir = (result.dir + 1) % 4;
-                var newPoint = result.loc + vectors[newDir];
-                if (map.Contains(newPoint))
-                {
-                    queue.Enqueue((newPoint, result.dist + map[newPoint], newDir, 1), result.dist);
-                }
-            }
-
-            // straight
-            if (result.str < 3)
-            {
-                var newPoint = result.loc + vectors[result.dir];
-                if (map.Contains(newPoint))
-                {
-                    queue.Enqueue((newPoint, result.dist + map[newPoint], result.dir, result.str + 1), result.dist);
-                }
-            }
-        }
-
-        return min;
-    }
-
-    public static long FindShortestPath2(Grid<int> map, Point start, Point goal)
-    {
-        var min = long.MaxValue;
-
-        HashSet<(Point, int, int)> visited = new();
-        PriorityQueue<(Point loc, long dist, int dir, int str), long> queue = new([((start, 0, 1, 1), 0)]);
-
-        while (queue.TryDequeue(out var result, out _))
-        {
-            if (result.dist + result.loc.MDistanceTo(goal) >= min) continue;
-            if (result.loc == goal)
-            {
-                if (result.str >= 4) min = Math.Min(min, result.dist);
-                continue;
-            }
-            if (visited.Contains((result.loc, result.dir, result.str))) continue;
-            visited.Add((result.loc, result.dir, result.str));
-
-            //left
-            if (result.str >= 4)
-            {
-                var newDir = (result.dir + 3) % 4;
-                var newPoint = result.loc + vectors[newDir];
-                if (map.Contains(newPoint))
-                {
-                    queue.Enqueue((newPoint, result.dist + map[newPoint], newDir, 1), result.dist);
-                }
-
-            // right
-                newDir = (result.dir + 1) % 4;
-                newPoint = result.loc + vectors[newDir];
-                if (map.Contains(newPoint))
-                {
-                    queue.Enqueue((newPoint, result.dist + map[newPoint], newDir, 1), result.dist);
-                }
-            }
-
-            // straight
-            if (result.str < 10)
-            {
-                var newPoint = result.loc + vectors[result.dir];
-                if (map.Contains(newPoint))
-                {
-                    queue.Enqueue((newPoint, result.dist + map[newPoint], result.dir, result.str + 1), result.dist);
-                }
-            }
-        }
-
-        return min;
-    }
+    public static long FindShortestPath(Grid<int> map, Point start, Point goal, bool partone)
+        => new (HashSet<(Point, int, int)> visited, PriorityQueue<(Point loc, long dist, int dir, int str), long> queue)[] { ([], new([((start, 0, 1, 1), 0)])) }.Select(s => 
+        Utils.EnumerateForever().Select(_ => s.queue.Dequeue())
+            .AggregateWhile(long.MaxValue, (min, result) =>
+                result.dist + result.loc.MDistanceTo(goal) >= min ? min :
+                result.loc == goal
+                    ? result.str >= 4 || partone ? Math.Min(min, result.dist) : min
+                    : s.visited.Contains((result.loc, result.dir, result.str)) ? min :
+            s.visited.Add((result.loc, result.dir, result.str)) &&
+                (result.str < 4 && !partone ||
+                new int[] { (result.dir + 3) % 4, (result.dir + 1) % 4 }.Select(newDir => (newDir, newPoint: result.loc + vectors[newDir]))
+                    .Select(d => !map.Contains(d.newPoint) || new Action(() => s.queue.Enqueue((d.newPoint, result.dist + map[d.newPoint], d.newDir, 1), result.dist)).InvokeTruthfully()).All(b => b)) &&
+                 result.str >= (partone ? 3 : 10) || new Point[] { result.loc + vectors[result.dir] }
+                    .Select(d => !map.Contains(d) || new Action(() => s.queue.Enqueue((d, result.dist + map[d], result.dir, result.str + 1), result.dist)).InvokeTruthfully()).First()
+                ? min : min
+            , _ => s.queue.Count > 0)).First();
 
     public string SolvePart1(string input)
-    {
-        var map = new Grid<int>(input.Split(Environment.NewLine).Select(l => l.Select(i => int.Parse($"{i}")).ToArray()).ToArray());
-        var goal = (map.Width - 1, map.Height - 1);
-
-        return $"{FindShortestPath(map, (0, 0), goal)}";
-    }
+        => $"{new Grid<int>[] { new(input.Split(Environment.NewLine).Select(l => l.Select(i => int.Parse($"{i}")).ToArray()).ToArray()) }
+            .Select(map => FindShortestPath(map, (0, 0), (map.Width - 1, map.Height - 1), true)).First()}";
 
     public string SolvePart2(string input)
-    {
-        var map = new Grid<int>(input.Split(Environment.NewLine).Select(l => l.Select(i => int.Parse($"{i}")).ToArray()).ToArray());
-        var goal = (map.Width - 1, map.Height - 1);
-
-        return $"{FindShortestPath2(map, (0, 0), goal)}";
-    }
+        => $"{new Grid<int>[] { new(input.Split(Environment.NewLine).Select(l => l.Select(i => int.Parse($"{i}")).ToArray()).ToArray()) }
+            .Select(map => FindShortestPath(map, (0, 0), (map.Width - 1, map.Height - 1), false)).First()}";
 }

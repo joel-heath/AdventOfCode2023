@@ -30,6 +30,11 @@ public static class Utils
     {
         while (true) yield return value;
     }
+    public static IEnumerable<object> EnumerateForever()
+    {
+        var obj = new object();
+        while (true) yield return obj;
+    }
 
 
     public static long GCF(long a, long b)

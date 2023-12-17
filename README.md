@@ -31,7 +31,7 @@ Since any one-liner calling another one-liner recursive function could be reduce
 | [14](AdventOfCode2023/Day14.cs) | 🟢 | Today's is (as is typical from myself) using impure LINQ methods with some very questionable approaches to forcing evaluation. My solution is `x => x.ToArray().Length == 0`, so the compiler can't cut any corners and has to evaluate every element of the array. |
 | [15](AdventOfCode2023/Day15.cs) | 🟢 | A very simple part one following a primitive hashing algorithm, part two introduces some new features, but nothing aggregation can't handle. |
 | [16](AdventOfCode2023/Day16.cs) | 🟢 | I solved today's using recursion & a sort-of memo (since I'm again using impure LINQ, if the current state is in the memo, it just returns). This one's also got some rather wild looking boolean operations & ternary ifs. |
-| [17](AdventOfCode2023/Day17.cs) | ⚫ |  |
+| [17](AdventOfCode2023/Day17.cs) | 🟢 | Solved today's again using very impure LINQ with my `EnumerateForever` & `AggregateWhile` extension methods. The trick was using a priority queue based on the distance from the start node, and clever methods to reduce the search space.  |
 | [18](AdventOfCode2023/Day18.cs) | ⚫ |  |
 | [19](AdventOfCode2023/Day19.cs) | ⚫ |  |
 | [20](AdventOfCode2023/Day20.cs) | ⚫ |  |
