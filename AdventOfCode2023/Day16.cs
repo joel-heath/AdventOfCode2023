@@ -24,7 +24,7 @@ public class Day16 : IDay
 
     public HashSet<Point> TrackBeam(Grid<char> map, Point location, int direction, HashSet<Point>? points = null, HashSet<(Point, int)>? memo = null)
     => new (HashSet<Point>, HashSet<(Point, int)>)[] { (points ??= [], memo ??= []) }.Select(_ =>
-        memo.Contains((location, direction)) || !map.IsInGrid(location) ? points :
+        memo.Contains((location, direction)) || !map.Contains(location) ? points :
             Utils.EnumerateForever(new object()).TakeWhile(_ =>
                 new char[] { points.Add(location) && false || memo.Add((location, direction)) ? map[location] : map[location] }.Select(symbol =>
                     symbol == '\\' || symbol == '/'
@@ -36,6 +36,6 @@ public class Day16 : IDay
                                 : TrackBeam(map, location + (1, 0), 1, points, memo).Count == -1 ||
                                    TrackBeam(map, location + (-1, 0), 3, points, memo).Count == -1))
                     .Select(b => b && (location += vectors[direction]) != (-1, -1))
-                    .First() && map.IsInGrid(location)
+                    .First() && map.Contains(location)
                     ).ToArray().Length == 1 ? points : points).First();
 }

@@ -47,7 +47,7 @@ public class Grid<T>(int x, int y)
         }
     }
 
-    public bool IsInGrid(Point p) => p.X >= 0 && p.X < Width && p.Y >= 0 && p.Y < Height;
+    public bool Contains(Point p) => 0 <= p.X && p.X < Width && 0 <= p.Y && p.Y < Height;
 
     public static readonly IEnumerable<Point> CardinalVectors = new Point[] { (0, -1), (1, 0), (0, 1), (-1, 0) };
     public static readonly IEnumerable<Point> DiagonalVectors = new Point[] { (1, -1), (1, 1), (-1, 1), (-1, -1) };
@@ -57,10 +57,10 @@ public class Grid<T>(int x, int y)
         if (p == (7, 1))
         {
             var neighbours2 = includeDiagonals ? CardinalVectors.Concat(DiagonalVectors) : CardinalVectors;
-            return neighbours2.Select(n => p + n).Where(IsInGrid);
+            return neighbours2.Select(n => p + n).Where(Contains);
         }
         var neighbours = includeDiagonals ? CardinalVectors.Concat(DiagonalVectors) : CardinalVectors;
-        return neighbours.Select(n => p + n).Where(IsInGrid);
+        return neighbours.Select(n => p + n).Where(Contains);
     }
 
     public IEnumerable<Point> AllPositions()
@@ -76,7 +76,7 @@ public class Grid<T>(int x, int y)
 
     public IEnumerable<Point> LineOut(Point start, int direction, bool inclusive)
     {
-        if (!IsInGrid(start)) yield break;
+        if (!Contains(start)) yield break;
 
         if (inclusive) yield return start;
 
@@ -113,7 +113,7 @@ public class Grid<T>(int x, int y)
 
     public IEnumerable<Point> LineThrough(Point target, int direction, bool inclusive)
     {
-        if (!IsInGrid(target)) yield break;
+        if (!Contains(target)) yield break;
 
         if (direction == 0) // North to south
         {
@@ -137,7 +137,7 @@ public class Grid<T>(int x, int y)
 
     public IEnumerable<Point> LineTo(Point start, Point end, bool inclusive = true)
     {
-        if (!IsInGrid(start) || !IsInGrid(end)) yield break;
+        if (!Contains(start) || !Contains(end)) yield break;
 
         if (start.X == end.X)
         {

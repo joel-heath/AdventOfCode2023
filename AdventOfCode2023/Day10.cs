@@ -64,7 +64,7 @@ public class Day10 : IDay
         {
             visited.Add(node.Item1);
             max = Math.Max(max, node.Item2);
-            foreach (var neighbor in vectors.Select(v => (node.Item1, node.Item1 + v, v)).Where(n => map.IsInGrid(n.Item2) &&
+            foreach (var neighbor in vectors.Select(v => (node.Item1, node.Item1 + v, v)).Where(n => map.Contains(n.Item2) &&
                 new (char current, char destination)[] { (map[n.Item1], map[n.Item2]) }
                     .Select(t => n.v switch
                     {
