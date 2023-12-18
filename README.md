@@ -32,7 +32,7 @@ Since any one-liner calling another one-liner recursive function could be reduce
 | [15](AdventOfCode2023/Day15.cs) | 🟢 | A very simple part one following a primitive hashing algorithm, part two introduces some new features, but nothing aggregation can't handle. |
 | [16](AdventOfCode2023/Day16.cs) | 🟢 | I solved today's using recursion & a sort-of memo (since I'm again using impure LINQ, if the current state is in the memo, it just returns). This one's also got some rather wild looking boolean operations & ternary ifs. |
 | [17](AdventOfCode2023/Day17.cs) | 🟢 | Solved today's again using very impure LINQ with my `EnumerateForever` & `AggregateWhile` extension methods. The trick was using a priority queue based on the distance from the start node, and clever methods to reduce the search space.  |
-| [18](AdventOfCode2023/Day18.cs) | ⚫ |  |
+| [18](AdventOfCode2023/Day18.cs) | 🟢 | Today's part two had me clueless for quite a while but through some research I discovered signed areas of sides, and the many formulae for the sum of signed areas. I chose the [triangle formula](https://en.wikipedia.org/wiki/Shoelace_formula#Triangle_formula) |
 | [19](AdventOfCode2023/Day19.cs) | ⚫ |  |
 | [20](AdventOfCode2023/Day20.cs) | ⚫ |  |
 | [21](AdventOfCode2023/Day21.cs) | ⚫ |  |

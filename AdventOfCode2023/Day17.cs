@@ -14,12 +14,18 @@ public class Day17 : IDay
 
     private static readonly Point[] vectors = [(0, -1), (1, 0), (0, 1), (-1, 0)];
 
-    public static long FindShortestPath(Grid<int> map, Point start, Point goal, bool partone)
-        => new (HashSet<(Point, int, int)> visited, PriorityQueue<(Point loc, long dist, int dir, int str), long> queue)[] { ([], new([((start, 0, 1, 1), 0)])) }.Select(s => 
+    public string SolvePart1(string input) => $"{Solve(input, true)}";
+
+    public string SolvePart2(string input) => $"{Solve(input, false)}";
+
+    public static long Solve(string input, bool partone)
+        => new Grid<int>[] { new(input.Split(Environment.NewLine).Select(l => l.Select(i => int.Parse($"{i}")).ToArray()).ToArray()) }
+            .Select(map => 
+        new (HashSet<(Point, int, int)> visited, PriorityQueue<(Point loc, long dist, int dir, int str), long> queue)[] { ([], new([(((0, 0), 0, 1, 1), 0)])) }.Select(s => 
         Utils.EnumerateForever().Select(_ => s.queue.Dequeue())
             .AggregateWhile(long.MaxValue, (min, result) =>
-                result.dist + result.loc.MDistanceTo(goal) >= min ? min :
-                result.loc == goal
+                result.dist + result.loc.MDistanceTo((map.Width - 1, map.Height - 1)) >= min ? min :
+                result.loc == (map.Width - 1, map.Height - 1)
                     ? result.str >= 4 || partone ? Math.Min(min, result.dist) : min
                     : s.visited.Contains((result.loc, result.dir, result.str)) ? min :
             s.visited.Add((result.loc, result.dir, result.str)) &&
@@ -28,14 +34,5 @@ public class Day17 : IDay
                     .Select(d => !map.Contains(d.newPoint) || new Action(() => s.queue.Enqueue((d.newPoint, result.dist + map[d.newPoint], d.newDir, 1), result.dist)).InvokeTruthfully()).All(b => b)) &&
                  result.str >= (partone ? 3 : 10) || new Point[] { result.loc + vectors[result.dir] }
                     .Select(d => !map.Contains(d) || new Action(() => s.queue.Enqueue((d, result.dist + map[d], result.dir, result.str + 1), result.dist)).InvokeTruthfully()).First()
-                ? min : min
-            , _ => s.queue.Count > 0)).First();
-
-    public string SolvePart1(string input)
-        => $"{new Grid<int>[] { new(input.Split(Environment.NewLine).Select(l => l.Select(i => int.Parse($"{i}")).ToArray()).ToArray()) }
-            .Select(map => FindShortestPath(map, (0, 0), (map.Width - 1, map.Height - 1), true)).First()}";
-
-    public string SolvePart2(string input)
-        => $"{new Grid<int>[] { new(input.Split(Environment.NewLine).Select(l => l.Select(i => int.Parse($"{i}")).ToArray()).ToArray()) }
-            .Select(map => FindShortestPath(map, (0, 0), (map.Width - 1, map.Height - 1), false)).First()}";
+                ? min : min, _ => s.queue.Count > 0)).First()).First();
 }
