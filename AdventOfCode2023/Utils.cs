@@ -36,18 +36,42 @@ public static class Utils
         while (true) yield return obj;
     }
 
-
-    public static long GCF(long a, long b)
-    {
-        while (b != 0)
-        {
-            (a, b) = (b, a % b);
-        }
-        return a;
-    }
-
+    public static long GCF(long a, long b) => EnumerateForever().AggregateWhile((a, b), (acc, _) => (acc.b, acc.a % acc.b), acc => acc.b != 0).a;
     public static long LCM(long a, long b) => a * b / GCF(a, b);
     public static long LCM(params long[] a) => a.Aggregate(LCM);
+
+    public static (List<(string name, Dictionary<int, T> edges)> graph, Dictionary<string, int> nameToIndexMap) GenerateGraph<T>(IEnumerable<(string source, string destination, T weight)> mappings, bool directed = false)
+    {
+        Dictionary<string, int> nameToIndex = [];
+        List<(string name, Dictionary<int, T> edges)> graph = [];
+
+        foreach ((string source, string destination, T weight) in mappings)
+        {
+            if (!nameToIndex.TryGetValue(source, out int fromIndex))
+            {
+                fromIndex = graph.Count;
+                graph.Add((source, []));
+                nameToIndex[source] = fromIndex;
+            }
+            if (!nameToIndex.TryGetValue(destination, out int toIndex))
+            {
+                toIndex = graph.Count;
+                graph.Add((destination, []));
+                nameToIndex[destination] = toIndex;
+            }
+
+            var fromEdges = graph[fromIndex].edges;
+            fromEdges[toIndex] = weight;
+
+            if (!directed)
+            {
+                var toEdges = graph[toIndex].edges;
+                toEdges[fromIndex] = weight;
+            }
+        }
+
+        return (graph, nameToIndex);
+    }
 
     public static bool IsMatch(string pattern, string str)
     => new Regex(pattern).Match(str).Success;
