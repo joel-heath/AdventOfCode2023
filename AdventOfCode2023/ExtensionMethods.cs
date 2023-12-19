@@ -16,7 +16,7 @@ public static class ExtensionMethods
         long count = 1;
         while (enumerator.MoveNext())
         {
-            if (enumerator.Current.Equals(curr))
+            if (enumerator.Current!.Equals(curr))
             {
                 count++;
             }

@@ -8,9 +8,9 @@ Since any one-liner calling another one-liner recursive function could be reduce
 
 ### Legend
 🟢 Successful one-liner.<br>
-🟡 One-liner with up to three functions / class variables<br>
-🟠 Far from a one-liner, with minimal amounts of code reduced.<br>
-🔴 Barely a visible effort to reduce the code. <br>
+🟡 One-liner with other multiple one-liner methods & classes all of which only contain one-liner methods.<br>
+🟠 One-liner with some functions that are more than one-line long.<br>
+🔴 Far from a one-liner, with minimal amounts of code reduced.<br>
 ⚫ Unattempted (probably because the problem isn't out yet, or I forgot to push).
 
 | **Day** | **Verbosity** | **Notes** |
@@ -24,7 +24,7 @@ Since any one-liner calling another one-liner recursive function could be reduce
 | [7](AdventOfCode2023/Day07.cs) | 🟢 | Today's wasn't too bad, the end goal was to calculate a unique score for each possible hand, and use `OrderBy()` to do the rest of the work. I achieved this by treating the cards as a base 14 (since number 1 is skipped) number system, then adding very large quantities for the number of duplicate card values. |
 | [8](AdventOfCode2023/Day08.cs) | 🟢 | Part 2 is a classic lowest common multiple problem, solve each individually and find their LCM. I'm using my custom `AggregateWhile` and `EnumerateForever` methods to make a LINQ-y way of doing while loops. |
 | [9](AdventOfCode2023/Day09.cs) | 🟢 | Full one-liners today, which I was not expecting. I achieved it through using `Aggregate()` three times for part two. |
-| [10](AdventOfCode2023/Day10.cs) | 🟡 | I chose to solve part two through PIP even-odd ray casting. This can be problematic when a point shares a coordinate with both vertices of an edge, but a simple rule of "if the edges go in different directions, count it once" fixes that. |
+| [10](AdventOfCode2023/Day10.cs) | 🟠 | I chose to solve part two through PIP even-odd ray casting. This can be problematic when a point shares a coordinate with both vertices of an edge, but a simple rule of "if the edges go in different directions, count it once" fixes that. |
 | [11](AdventOfCode2023/Day11.cs) | 🟢 | Again made use of my point class today, as well as a very helpful [combinations method](https://stackoverflow.com/a/33336576/13361257) to find all n(n+1)/2 different pairs of galaxies. |
 | [12](AdventOfCode2023/Day12.cs) | 🟢 | Solved part 2 like many with memoization. Today's I've reduced to a one liner, but it increases the runtime from less than a second to about a second and a half, so though I consider this a win as I got a one-liner, I will keep my many-lined solution. |
 | [13](AdventOfCode2023/Day13.cs) | 🟢 | Pretty nice part one & two, perfect for multiple use of LINQ's `All()` for part two I used the exact same code, but it stores whether it's found a smudge (an error), then if it finds a second one it returns false. |
@@ -33,7 +33,7 @@ Since any one-liner calling another one-liner recursive function could be reduce
 | [16](AdventOfCode2023/Day16.cs) | 🟢 | I solved today's using recursion & a sort-of memo (since I'm again using impure LINQ, if the current state is in the memo, it just returns). This one's also got some rather wild looking boolean operations & ternary ifs. |
 | [17](AdventOfCode2023/Day17.cs) | 🟢 | Solved today's again using very impure LINQ with my `EnumerateForever` & `AggregateWhile` extension methods. The trick was using a priority queue based on the distance from the start node, and clever methods to reduce the search space.  |
 | [18](AdventOfCode2023/Day18.cs) | 🟢 | Today's part two had me clueless for quite a while but through some research I discovered signed areas of sides, and the many formulae for the sum of signed areas. I chose the [triangle formula](https://en.wikipedia.org/wiki/Shoelace_formula#Triangle_formula) |
-| [19](AdventOfCode2023/Day19.cs) | ⚫ |  |
+| [19](AdventOfCode2023/Day19.cs) | 🟡 | I gave in to OOP today & made a Workflow class with a discriminated union for the "if false" option. Solved part two by recursively counting options by refining ranges. |
 | [20](AdventOfCode2023/Day20.cs) | ⚫ |  |
 | [21](AdventOfCode2023/Day21.cs) | ⚫ |  |
 | [22](AdventOfCode2023/Day22.cs) | ⚫ |  |

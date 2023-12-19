@@ -21,6 +21,22 @@ public static class Utils
     }
 
     /// <summary>
+    /// Utils.Range but with a custom increment, therefore count is absolute
+    /// </summary>
+    /// <param name="start">The starting element of the range</param>
+    /// <param name="count">The vector difference between the start value and end</param>
+    /// <returns>Such numbers as described</returns>
+    public static IEnumerable<int> Range(int start, int count, int step)
+    {
+        int end = start + count * step;
+        while (start != end)
+        {
+            yield return start;
+            start += step;
+        }
+    }
+
+    /// <summary>
     /// Infinitely yields the value parameter (intended to be used with AggregateWhile)
     /// </summary>
     /// <typeparam name="T">Type of value</typeparam>
