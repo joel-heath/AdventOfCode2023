@@ -34,7 +34,7 @@ Since any one-liner calling another one-liner recursive function could be reduce
 | [17](AdventOfCode2023/Day17.cs) | 🟢 | Solved today's again using very impure LINQ with my `EnumerateForever` & `AggregateWhile` extension methods. The trick was using a priority queue based on the distance from the start node, and clever methods to reduce the search space.  |
 | [18](AdventOfCode2023/Day18.cs) | 🟢 | Today's part two had me clueless for quite a while but through some research I discovered signed areas of sides, and the many formulae for the sum of signed areas. I chose the [triangle formula](https://en.wikipedia.org/wiki/Shoelace_formula#Triangle_formula) |
 | [19](AdventOfCode2023/Day19.cs) | 🟡 | I gave in to OOP today & made a Workflow class with a discriminated union for the "if false" option. Solved part two by recursively counting options by refining ranges. |
-| [20](AdventOfCode2023/Day20.cs) | ⚫ |  |
+| [20](AdventOfCode2023/Day20.cs) | 🟡 | Similarly to yesterday I object-oriented today's solution, yet somehow I still managed to make every function a one-liner so only yellow for today. For my input, `rx`'s inputs were all conjunctions (and hence all needed to be 1s) so I found when all of `rx`'s inputs' inputs were 0s, and calculated their LCM. |
 | [21](AdventOfCode2023/Day21.cs) | ⚫ |  |
 | [22](AdventOfCode2023/Day22.cs) | ⚫ |  |
 | [23](AdventOfCode2023/Day23.cs) | ⚫ |  |
