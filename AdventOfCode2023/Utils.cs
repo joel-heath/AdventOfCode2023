@@ -55,6 +55,7 @@ public static class Utils
     public static long GCF(long a, long b) => EnumerateForever().AggregateWhile((a, b), (acc, _) => (acc.b, acc.a % acc.b), acc => acc.b != 0).a;
     public static long LCM(long a, long b) => a * b / GCF(a, b);
     public static long LCM(params long[] a) => a.Aggregate(LCM);
+    public static long LCM(IEnumerable<long> a) => a.Aggregate(LCM);
 
     public static (List<(string name, Dictionary<int, T> edges)> graph, Dictionary<string, int> nameToIndexMap) GenerateGraph<T>(IEnumerable<(string source, string destination, T weight)> mappings, bool directed = false)
     {
