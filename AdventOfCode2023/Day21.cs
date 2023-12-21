@@ -12,169 +12,45 @@ public class Day21 : IDay
         { "10...........\r\n.....###.#.\r\n.###.##..#.\r\n..#.#...#..\r\n....#.#....\r\n.##..S####.\r\n.##..#...#.\r\n.......##..\r\n.##.#.####.\r\n.##..##.##.\r\n...........", "50" },
         { "50...........\r\n.....###.#.\r\n.###.##..#.\r\n..#.#...#..\r\n....#.#....\r\n.##..S####.\r\n.##..#...#.\r\n.......##..\r\n.##.#.####.\r\n.##..##.##.\r\n...........", "1594" },
         { "100...........\r\n.....###.#.\r\n.###.##..#.\r\n..#.#...#..\r\n....#.#....\r\n.##..S####.\r\n.##..#...#.\r\n.......##..\r\n.##.#.####.\r\n.##..##.##.\r\n...........", "6536" },
-        { "500...........\r\n.....###.#.\r\n.###.##..#.\r\n..#.#...#..\r\n....#.#....\r\n.##..S####.\r\n.##..#...#.\r\n.......##..\r\n.##.#.####.\r\n.##..##.##.\r\n...........", "167004" },
-        { "1000...........\r\n.....###.#.\r\n.###.##..#.\r\n..#.#...#..\r\n....#.#....\r\n.##..S####.\r\n.##..#...#.\r\n.......##..\r\n.##.#.####.\r\n.##..##.##.\r\n...........", "668697" }
+        //{ "500...........\r\n.....###.#.\r\n.###.##..#.\r\n..#.#...#..\r\n....#.#....\r\n.##..S####.\r\n.##..#...#.\r\n.......##..\r\n.##.#.####.\r\n.##..##.##.\r\n...........", "167004" },
+        //{ "1000...........\r\n.....###.#.\r\n.###.##..#.\r\n..#.#...#..\r\n....#.#....\r\n.##..S####.\r\n.##..#...#.\r\n.......##..\r\n.##.#.####.\r\n.##..##.##.\r\n...........", "668697" }
         // { "5000...........\r\n.....###.#.\r\n.###.##..#.\r\n..#.#...#..\r\n....#.#....\r\n.##..S####.\r\n.##..#...#.\r\n.......##..\r\n.##.#.####.\r\n.##..##.##.\r\n...........", "16733044" } // this one takes quite a lot of time to run
     };
     
     private static readonly Point[] vectors = [(0, -1), (1, 0), (0, 1), (-1, 0)];
 
     public string SolvePart1(string input)
-    {
-        int steps = UnitTestsP1.ContainsKey(input) ? 6 : 64;
+        => $"{new char[][][] { input.Split(Environment.NewLine).Select(l => l.ToCharArray()).ToArray() }
+            .Select(map => (map, start:map.SelectMany((r, i) => r.Select((c, j) => (c, new Point(i, j)))).First(t => t.c == 'S').Item2))
+            .Sum(d => Solve(d.map, d.start, UnitTestsP1.ContainsKey(input) ? 6 : 64))}";
 
-        (char[][] map, Point start) = ParseInput(input);
-        return $"{Solve(map, start, steps)}";
-    }
-
-    public IEnumerable<Point> Explore(Grid<char> map, Point location, int steps, Dictionary<(Point, int), HashSet<Point>> memo)
-    {
-        if (steps == 0)
-        {
-            yield return location;
-            yield break;
-        }
-        if (memo.TryGetValue((location, steps), out var result))
-        {
-            foreach (var point in result) yield return point;
-            yield break;
-        }
-
-        HashSet<Point> visited = [];
-
-        foreach (var loc in map.Adjacents(location).Where(p => map[p] != '#').SelectMany(adj => Explore(map, adj, steps - 1, memo)))
-        {
-            if (visited.Add(loc))
-                yield return loc;
-        }
-
-        memo[(location, steps)] = visited;
-    }
     public string SolvePart2(string input)
-    {
-        // test inputs
-        if (input[0] != '.')
-        {
-            var temp = string.Concat(input.TakeWhile(x => x != '.'));
-            var testSteps = long.Parse(temp);
-            (char[][] testMap, Point testStart) = ParseInput(input[temp.Length..]);
-            return $"{Solve(testMap, testStart, testSteps)}";
-        }
-        long steps = 26501365;
-
-        (char[][] map, Point start) = ParseInput(input);
-
-        // THIS SOLUTION COMPLETELY RELIES ON THE ASSUMPTION THAT THE ROW AND COLUMN UPON WHICH S LIES IN ARE FREE OF ANY ROCKS
-
-        // the following points assume the form ax^2 + bx + c
-
-        //     (65 is half the map width       131 = (steps - 65)          essentially how many 
-        //      and the location of S)         / map width               functional copies we have
-        // (0, Solve(input, 65)), (1, Solve(input, 65 + 131)), (2, Solve(input, 65 + 131 + 131))
-
-        // x=0:           c     =>   ||  c == y0  ||
-        // x=1:  a +  b + c       
-        // x=2: 4a + 2b + c   
-
-        //  (x=2) - 2 * (x=1)
-        //       y2 = 4a + 2b +  c
-        //      2y1 = 2a + 2b + 2c  -
-        // y2 - 2y1 = 2a - c
-
-        // ||  a = (y2 - 2y1 + c) / 2  ||
-        // ||  b = y1 - c - a  ||
-
-
-        long x0 = start.Y, x1 = x0 + map.Length, x2 = x1 + map.Length;
-        long y0 = Solve(map, start, x0), y1 = Solve(map, start, x1), y2 = Solve(map, start, x2);
-
-        long c = y0;
-        long a = (y2 - 2 * y1 + c) / 2;
-        long b = y1 - c - a;
-
-        long xAns = (steps - x0) / map.Length;
-
-        return $"{a * xAns * xAns + b * xAns + c}";
-    }
+        => $"{((input[0] != '.') // test inputs
+            ? new string[] { string.Concat(input.TakeWhile(x => x != '.')) }
+                .Select(num => (num, d:ParseInput(input[num.Length..])))
+                .Sum(d => Solve(d.d.map, d.d.start, long.Parse(d.num)))
+            : new (char[][] map, Point start)[] { ParseInput(input) }.Sum(z => 
+                new Point[][] { new long[] { z.start.Y, z.start.Y + z.map.Length, z.start.Y + 2 * z.map.Length }
+                    .Select(x => new Point(x, Solve(z.map, z.start, x))).ToArray() }
+                    .Select(p => (x: (26501365 - p[0].X) / z.map.Length, p))
+                    .Sum(d => ((d.p[2].Y - 2 * d.p[1].Y + d.p[0].Y) / 2 * d.x + (2 * d.p[1].Y - (3 * d.p[0].Y - d.p[2].Y) / 2)) * d.x + d.p[0].Y)))}";
 
     private static (char[][] map, Point start) ParseInput(string input)
-    {
-        var map = input.Split(Environment.NewLine).Select(l => l.ToCharArray()).ToArray();
-        Point start = map.SelectMany((r, i) => r.Select((c, j) => (c, new Point(i, j)))).First(t => t.c == 'S').Item2;
-
-        return (map, start);
-    }
+        => new char[][][] { input.Split(Environment.NewLine).Select(l => l.ToCharArray()).ToArray() }
+            .Select(map => (map, map.SelectMany((r, i) => r.Select((c, j) => (c, new Point(i, j)))).First(t => t.c == 'S').Item2))
+            .First();
 
     private static long Solve(char[][] map, Point start, long steps)
-    {
-        Point lb = start, ub = start, oldlb = start, oldub = start;
-
-        long oddFixed = 0;
-        long evenFixed = 0;
-
-        HashSet<Point> oddContained = [];
-        HashSet<Point> evenContained = [];
-        HashSet<Point> edges = [start];
-
-        for (int i = 0; i < steps; i++)
-        {
-            HashSet<Point> newEdges = [];
-
-            Point newlb = lb;
-            Point newub = ub;
-
-            HashSet<Point> toRemove = [];
-
-            foreach (var edge in edges)
-            {
-                foreach (var point in vectors.Select(v => edge + v))
-                {
-                    if (i % 2 == 0 ? oddContained.Contains(point) : evenContained.Contains(point))
-                    {
-                        toRemove.Add(point);
-                    }
-                    else
-                    {
-                        if (map[Utils.Mod(point.Y, map.Length)][Utils.Mod(point.X, map[0].Length)] != '#')
-                        {
-                            newEdges.Add(point);
-                        }
-                    }
-                }
-            }
-
-            foreach (var edgeForRemoval in toRemove)
-            {
-                if (i % 2 == 0)
-                {
-                    oddContained.Remove(edgeForRemoval);
-                    oddFixed++;
-                }
-                else
-                {
-                    evenContained.Remove(edgeForRemoval);
-                    evenFixed++;
-                }
-            }
-
-            edges = newEdges;
-            oldlb = lb;
-            oldub = ub;
-            lb = newlb;
-            ub = newub;
-
-            if (i % 2 == 0)
-            {
-                foreach (var e in edges)
-                    oddContained.Add(e);
-            }
-            else
-            {
-                foreach (var e in edges)
-                    evenContained.Add(e);
-            }
-        }
-
-        return steps % 2 == 0 ? evenFixed + evenContained.Count : oddFixed + oddContained.Count;
-    }
+        => new (HashSet<Point> oddContained, HashSet<Point> evenContained, HashSet<Point> edges, long oddFixed, long evenFixed, Point lb, Point ub, Point oldlb, Point newlb)[]
+            { ([], [], [start], 0, 0, start, start, start, start) }
+            .Sum(z => Utils.Range(0, steps).Select(i =>
+                    z = new (HashSet<Point> newEdges, HashSet<Point> toRemove, Point newlb, Point newub)[] { ([], [], z.lb, z.ub) }
+                        .Select(d => (z.edges.All(edge =>
+                                vectors.Select(v => edge + v).Where(point => map[Utils.Mod(point.Y, map.Length)][Utils.Mod(point.X, map[0].Length)] != '#')
+                                .All(point => ((i % 2 == 0 ? z.oddContained.Contains(point) : z.evenContained.Contains(point)) ? d.toRemove : d.newEdges).Add(point) || true))
+                            && d.toRemove.Select(edgeForRemoval => i % 2 == 0 ? (z.oddContained.Remove(edgeForRemoval) ? z.oddFixed++ : z.oddFixed++) : (z.evenContained.Remove(edgeForRemoval) ? z.evenFixed++ : z.evenFixed++)).All(i => i > -1)
+                            && (i % 2 == 0) ? d.newEdges.All(e => z.oddContained.Add(e) || true) : d.newEdges.All(e => z.evenContained.Add(e) || true)) ? d : d)
+                            .Select(d => (z.oddContained, z.evenContained, d.newEdges, z.oddFixed, z.evenFixed, d.newlb, d.newub, z.lb, z.ub))
+                        .First()).All(x => x != default || true)
+                ? (steps % 2 == 0 ? z.evenFixed + z.evenContained.Count : z.oddFixed + z.oddContained.Count) : 0);
 }

@@ -35,7 +35,7 @@ Since any one-liner calling another one-liner recursive function could be reduce
 | [18](AdventOfCode2023/Day18.cs) | 🟢 | Today's part two had me clueless for quite a while but through some research I discovered signed areas of sides, and the many formulae for the sum of signed areas. I chose the [triangle formula](https://en.wikipedia.org/wiki/Shoelace_formula#Triangle_formula) |
 | [19](AdventOfCode2023/Day19.cs) | 🟡 | I gave in to OOP today & made a Workflow class with a discriminated union for the "if false" option. Solved part two by recursively counting options by refining ranges. |
 | [20](AdventOfCode2023/Day20.cs) | 🟡 | Similarly to yesterday I object-oriented today's solution, yet somehow I still managed to make every function a one-liner so only yellow for today. For my input, `rx`'s inputs were all conjunctions (and hence all needed to be 1s) so I found when all of `rx`'s inputs' inputs were 0s, and calculated their LCM. |
-| [21](AdventOfCode2023/Day21.cs) | ⚫ |  |
+| [21](AdventOfCode2023/Day21.cs) | 🟢 | I solved today's part two by noticing the empty "highways" on the starting position row, meaning you can directly get to a loop of the map, and massively reducing the problem. The map grows in a square so by finding the total number of reachable garden plots for 3 different numbers of repeats of the map, you can find the coefficients of a quadratic representing n repeats. Finally, since 26501365 = 131 * 202300 (grid size) + 65 (starting position), there are 131 repeats. |
 | [22](AdventOfCode2023/Day22.cs) | ⚫ |  |
 | [23](AdventOfCode2023/Day23.cs) | ⚫ |  |
 | [24](AdventOfCode2023/Day24.cs) | ⚫ |  |

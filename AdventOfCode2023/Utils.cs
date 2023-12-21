@@ -21,10 +21,10 @@ public static class Utils
     /// <param name="start">The starting element of the range</param>
     /// <param name="count">The vector difference between the start value and end</param>
     /// <returns>Such numbers as described</returns>
-    public static IEnumerable<int> Range(int start, int count)
+    public static IEnumerable<long> Range(long start, long count)
     {
-        int end = start + count;
-        int inc = end < start ? -1 : 1;
+        long end = start + count;
+        long inc = end < start ? -1 : 1;
         while (start != end)
         {
             yield return start;
@@ -38,9 +38,9 @@ public static class Utils
     /// <param name="start">The starting element of the range</param>
     /// <param name="count">The vector difference between the start value and end</param>
     /// <returns>Such numbers as described</returns>
-    public static IEnumerable<int> Range(int start, int count, int step)
+    public static IEnumerable<long> Range(long start, long count, long step)
     {
-        int end = start + count * step;
+        long end = start + count * step;
         while (start != end)
         {
             yield return start;
