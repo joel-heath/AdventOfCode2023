@@ -53,11 +53,6 @@ public class Grid<T>(int x, int y)
 
     public IEnumerable<Point> Adjacents(Point p, bool includeDiagonals = false)
     {
-        if (p == (7, 1))
-        {
-            var neighbours2 = includeDiagonals ? CardinalVectors.Concat(DiagonalVectors) : CardinalVectors;
-            return neighbours2.Select(n => p + n).Where(Contains);
-        }
         var neighbours = includeDiagonals ? CardinalVectors.Concat(DiagonalVectors) : CardinalVectors;
         return neighbours.Select(n => p + n).Where(Contains);
     }
