@@ -4,6 +4,18 @@ namespace AdventOfCode2023;
 public static class Utils
 {
     /// <summary>
+    /// Standard modulo doesn't exhibit expected behavour for looping and wrapping indices (-1 % 5 != 4). This modulo function however works this way.
+    /// </summary>
+    /// <param name="dividend">a in a % b (dividend)</param>
+    /// <param name="divisor">b in a % b (modolus)</param>
+    /// <returns>The reaminder of the dividend and the divisor</returns>
+    public static long Mod(long dividend, long divisor)
+    {
+        long r = dividend % divisor;
+        return r < 0 ? r + divisor : r;
+    }
+
+    /// <summary>
     /// Enumerable.Range but lazily evaluated & can have negative counts to go in reverse
     /// </summary>
     /// <param name="start">The starting element of the range</param>
