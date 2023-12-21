@@ -69,14 +69,43 @@ public class Day21 : IDay
 
         memo[(location, steps)] = visited;
     }
-    long mod(long x, int m)
-    {
-        return (x % m + m) % m;
-        }
+    long mod(long x, int m) => (x % m + m) % m;
     public string SolvePart2(string input)
     {
-        long total = 0;
+        // the following points assume the form ax^2 + bx + c
+        // (0, Solve(input, 65)), (1, Solve(input, 65 + 131)), (2, Solve(input, 65 + 131 + 131))
 
+        // x=0:           c   => c == y0
+        // x=1:  a +  b + c       
+        // x=2: 4a + 2b + c   
+
+        //  (x=2) - 2 * (x=1)
+        //       y2 = 4a + 2b +  c
+        //      2y1 = 2a + 2b + 2c  -
+        // y2 - 2y1 = 2a - c
+        
+        // a = (y2 - 2y1 + c) / 2
+
+        
+        // b = y1 - c - a
+
+
+        int x0 = 65, x1 = 65 + 131, x2 = 65 + 131 + 131;
+        long y0 = Solve(input, x0), y1 = Solve(input, x1), y2 = Solve(input, x2);
+
+        long c = y0;
+        long a = (y2 - 2 * y1 + c) / 2;
+        long b = y1 - c - a;
+
+        long xAns = 202300;
+
+        return $"{a * xAns * xAns + b * xAns + c}";
+
+        //int steps = UnitTestsP2.ContainsKey(input) ? 0 : 65;
+    }
+
+    long Solve(string input, int steps)
+    {
         var map = input.Split(Environment.NewLine).Select(l => l.ToCharArray()).ToArray();
         Point start = (-1, -1);
         for (int i = 0; i < map.Length && start.Y < 0; i++)
@@ -90,8 +119,6 @@ public class Day21 : IDay
                 }
             }
         }
-
-        int steps = UnitTestsP2.ContainsKey(input) ? 1000 : 26501365;
 
         Point lb = start, ub = start, oldlb = start, oldub = start;
 
@@ -123,11 +150,11 @@ public class Day21 : IDay
                     }
                     else
                     {
-                        if (map[mod(point.Y,map.Length)][mod(point.X,map[0].Length)] != '#')
+                        if (map[mod(point.Y, map.Length)][mod(point.X, map[0].Length)] != '#')
                         {
                             newEdges.Add(point);
                         }
-                            
+
                     }
                 }
             }
@@ -167,6 +194,6 @@ public class Day21 : IDay
             //Console.WriteLine($"Step {i} complete");
         }
 
-        return $"{(steps % 2 == 0 ? evenFixed + evenContained.Count : oddFixed + oddContained.Count)}";
+        return steps % 2 == 0 ? evenFixed + evenContained.Count : oddFixed + oddContained.Count;
     }
 }
