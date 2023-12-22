@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Runtime.CompilerServices;
+using System.Text;
 
 namespace AdventOfCode2023;
 public class Grid<T>(int x, int y)
@@ -204,11 +205,11 @@ public struct Point(long x, long y)
     }
 }
 
-public struct Coord(int x, int y, int z)
+public struct Coord(long x, long y, long z)
 {
-    public int X { get; set; } = x;
-    public int Y { get; set; } = y;
-    public int Z { get; set; } = z;
+    public long X { get; set; } = x;
+    public long Y { get; set; } = y;
+    public long Z { get; set; } = z;
 
     public static implicit operator Coord((int x, int y, int z) coords) => new(coords.x, coords.y, coords.z);
 
@@ -222,7 +223,7 @@ public struct Coord(int x, int y, int z)
 
     public static Coord operator +(Coord a, Coord b) => new(a.X + b.X, a.Y + b.Y, a.Z + b.Z);
     public static Coord operator -(Coord a, Coord b) => new(a.X - b.X, a.Y - b.Y, a.Z - b.Z);
-    public int this[int index]
+    public long this[int index]
     {
         readonly get => index == 0 ? X : index == 1 ? Y : index == 2 ? Z : throw new IndexOutOfRangeException();
         set
@@ -247,8 +248,8 @@ public struct Coord(int x, int y, int z)
     public static bool operator <=(Coord a, Coord b) => a.X <= b.X && a.Y <= b.Y && a.Z <= b.Z;
     public static bool operator >=(Coord a, Coord b) => a.X >= b.X && a.Y >= b.Y && a.Z >= b.Z;
     public override readonly string ToString() => $"({X}, {Y}, {Z})";
-    public readonly int[] ToArray() => [X, Y, Z];
-    public readonly void Deconstruct(out int x, out int y, out int z)
+    public readonly long[] ToArray() => [X, Y, Z];
+    public readonly void Deconstruct(out long x, out long y, out long z)
     {
         x = X;
         y = Y;
