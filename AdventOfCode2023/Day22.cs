@@ -48,66 +48,31 @@ public class Day22 : IDay
         var lines = input.Split(Environment.NewLine);
         for (int i = 0; i < lines.Length; i++)
         {
-            var line = lines[i].Split('~').Select(line => line.Split(',').Select(long.Parse).ToList())
-                .OrderBy(i => i[2]).ThenBy(i => i[0]).ThenBy(i => i[1]).ToList();
+            var line = lines[i].Split('~').Select(line => line.Split(',').Select(long.Parse).ToList()).OrderBy(i => i[2]).ToList();
             var a = line[0];
             var b = line[1];
 
             bricks.Add((new Coord(a[0], a[1], a[2]), new Coord(b[0], b[1], b[2])));
         }
 
-        bricks = [.. bricks.OrderBy(b => b.a.Z).ThenBy(b => b.b.Z)];
+        DropBricks(bricks = [.. bricks.OrderBy(b => b.a.Z).ThenBy(b => b.b.Z)]);
 
-        DropBricks(bricks);
-
-        //HashSet<(Coord a, Coord b)> disintegrable = [];
-
-        HashSet<(Coord a, Coord b)> disintegrable = bricks.ToHashSet();
-
+        HashSet<(Coord a, Coord b)> disintegrable = [.. bricks];
+       
         foreach (var (a, b) in bricks)
         {
-            var supportingBlocks = bricks.Where(k => k.b.Z == a.Z - 1 && Crossover2D(k, (a, b))).ToList();
+            var supportingBlocks = bricks.Where(k => k.b.Z == a.Z - 1 && Crossover(k, (a, b))).ToList();
 
             if (supportingBlocks.Count == 1)
             {
                 disintegrable.Remove(supportingBlocks[0]);
             }
-            /*
-            if (!bricks.Where(k => k.a.Z == b.Z + 1).Any(k => Crossover2D(k, (a, b))))
-            {
-                disintegrable.Add((a, b));
-            }
-
-            var supportingBlocks = bricks.Where(k => k.b.Z == a.Z - 1 && Crossover2D(k, (a, b))).ToList();
-
-            if (supportingBlocks.Count > 1)
-            {
-                foreach (var block in supportingBlocks)
-                    disintegrable.Add(block);
-            }
-            */
         }
 
         return $"{disintegrable.Count}";
     }
 
-    private static void DropBricks(List<(Coord a, Coord b)> bricks)
-    {
-        var floor = (a:new Coord(long.MinValue, long.MinValue, 0), b:new Coord(long.MaxValue, long.MaxValue, 0));
-        for (int i = 0; i < bricks.Count; i++)
-        {
-            var (a, b) = bricks[i];
-            var newZ = bricks.Where(k => k.b.Z < a.Z && Crossover2D((a, b), k)).Append(floor).Max(k => k.b.Z) + 1;
-            bricks[i] = (new Coord(a.X, a.Y, newZ), new Coord(b.X, b.Y, b.Z - a.Z + newZ));
-        }
-    }
 
-    private static bool Crossover2D((Coord a, Coord b) a, (Coord a, Coord b) b)  => Comparison2D(a, b) || Comparison2D(b, a);
-
-    private static bool Comparison2D((Coord a, Coord b) a, (Coord a, Coord b) b)
-        => Math.Min(a.a.X, a.b.X) <= Math.Max(b.a.X, b.b.X) && Math.Min(b.a.X, b.b.X) <= Math.Max(a.a.X, a.b.X)
-        && Math.Min(a.a.Y, a.b.Y) <= Math.Max(b.a.Y, b.b.Y) && Math.Min(b.a.Y, b.b.Y) <= Math.Max(a.a.Y, a.b.Y);
-        
 
     public string SolvePart2(string input)
     {
@@ -129,37 +94,39 @@ public class Day22 : IDay
 
         HashSet<(Coord a, Coord b)> toDisintegrate = [];
 
-        foreach (var (a, b) in bricks)
+        foreach (var (a, b) in bricks.Reverse<(Coord a, Coord b)>())
         {
-            var supportingBlocks = bricks.Where(k => k.b.Z == a.Z - 1 && Crossover2D(k, (a, b))).ToList();
+            var supportingBlocks = bricks.Where(k => k.b.Z == a.Z - 1 && Crossover(k, (a, b))).ToList();
 
             if (supportingBlocks.Count == 1)
-            {
                 toDisintegrate.Add(supportingBlocks[0]);
-            }
         }
 
         long total = 0;
         foreach (var item in toDisintegrate)
         {
-            total += CountFalls([.. bricks.Where(i => i != item)]);
+            total += DropBricks([.. bricks.Where(i => i != item)]);
         }
 
         return $"{total}";
     }
 
-    private static long CountFalls(List<(Coord a, Coord b)> bricks)
+    private static long DropBricks(List<(Coord a, Coord b)> bricks)
     {
         var floor = (a: new Coord(long.MinValue, long.MinValue, 0), b: new Coord(long.MaxValue, long.MaxValue, 0));
         long count = 0;
         for (int i = 0; i < bricks.Count; i++)
         {
             var (a, b) = bricks[i];
-            var newZ = bricks.Where(k => k.b.Z < a.Z && Crossover2D((a, b), k)).Append(floor).Max(k => k.b.Z) + 1;
+            var newZ = bricks.Where(k => k.b.Z < a.Z && Crossover((a, b), k)).Append(floor).Max(k => k.b.Z) + 1;
             if (newZ < a.Z) count++;
             bricks[i] = (new Coord(a.X, a.Y, newZ), new Coord(b.X, b.Y, b.Z - a.Z + newZ));
         }
 
         return count;
     }
+
+    private static bool Crossover((Coord a, Coord b) a, (Coord a, Coord b) b)
+        => Math.Min(a.a.X, a.b.X) <= Math.Max(b.a.X, b.b.X) && Math.Min(b.a.X, b.b.X) <= Math.Max(a.a.X, a.b.X)
+        && Math.Min(a.a.Y, a.b.Y) <= Math.Max(b.a.Y, b.b.Y) && Math.Min(b.a.Y, b.b.Y) <= Math.Max(a.a.Y, a.b.Y);
 }

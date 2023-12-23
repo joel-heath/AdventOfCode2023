@@ -1,5 +1,4 @@
-﻿using System.Runtime.CompilerServices;
-using System.Text;
+﻿using System.Text;
 
 namespace AdventOfCode2023;
 public class Grid<T>(int x, int y)
