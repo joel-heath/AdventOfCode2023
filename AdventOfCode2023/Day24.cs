@@ -1,8 +1,3 @@
-using System;
-using System.Linq;
-using System.Reflection.Metadata.Ecma335;
-using System.Runtime.Intrinsics.X86;
-
 namespace AdventOfCode2023;
 public class Day24 : IDay
 {
@@ -106,85 +101,34 @@ public class Day24 : IDay
 
     public string SolvePart2(string input)
     {
-        var allNums = Utils.GetLongs(input).ToArray();
-        List<(double px, double py, double pz, double vx, double vy, double vz)> hailstones = new();
+        List<long[]> hailstones = input.Split(Environment.NewLine).Select(l => l.Split(' ').Where((n, i) => n != "" && i != 3).Select(n => long.Parse(n.TrimEnd(','))).ToArray()).ToList();
 
-        var lines = input.Split(Environment.NewLine);
-        for (int i = 0; i < lines.Length; i++)
-        {
-            var data = lines[i].Split(' ').Where((n, i) => n != "" && i != 3).Select(n => double.Parse(n.TrimEnd(','))).ToList();
-            hailstones.Add((data[0], data[1], data[2], data[3], data[4], data[5]));
-        }
-
-        var (px1, py1, pz1, vx1, vy1, vz1) = hailstones[0];
-        var (px2, py2, pz2, vx2, vy2, vz2) = hailstones[1];
+        var h1 = hailstones[0];
+        var h2 = hailstones[1];
 
         const int range = 200;
 
-        for (int i = -range; i < range; i++)
+        for (var i = -range; i < range; i++)
         {
-            for (int j = -range; j < range; j++)
+            for (var j = -range; j < range; j++)
             {
-                /*
-                var mat = new Matrix(new double[,]
+                var det = (h1[3] - i) * (j - h2[4]) - (i - h2[3]) * (h1[4] - j);
+                if (det == 0) continue;
+
+                var t1 = 1d / det * ((j - h2[4]) * (h2[0] - h1[0]) + (h2[3] - i) * (h2[1] - h1[1]));
+                var t2 = 1d / det * ((j - h1[4]) * (h2[0] - h1[0]) + (h1[3] - i) * (h2[1] - h1[1]));
+
+                var x = (long)Math.Round(h1[0] + (h1[3] - i) * t1);
+                var y = (long)Math.Round(h1[1] + (h1[4] - j) * t1);
+
+                var k = (long)Math.Round((h2[2] + h2[5] * t2 - h1[2] - h1[5] * t1) / (t2 - t1));
+                var z = (long)Math.Round(h1[2] + (h1[5] - k) * t1);
+
+                var line = new long[] { x, y, z, i, j, k };
+
+                if (hailstones.Where((l, x) => x != i && x != j).All(l => Intersect(line, l)))
                 {
-                    { i - vx1, vx2 - i },
-                    { j - vy1, vy2 - j }
-                });
-
-                var det = mat.Determinant;
-                if (det == 0)
-                    continue;
-
-                var ans = 1 / det * mat.Adjugate * new Matrix(new double[,]
-                {
-                    { px1 - px2 },
-                    { py1 - py2 }
-                });
-
-                var t1 = ans[0, 0];
-                var t2 = ans[1, 0];*/
-
-                // solved algebraically
-                var t2 = ((i - vx1) * (py1 - py2) - (j - vy1) * (px1 - px2)) / ((i - vx1) * (vy2 - j) - (j - vy1) * (px2 - i));
-                var t1 = (px1 - px2 + (i - vx2) * t2) / (i - vx1);
-
-                var x = Math.Round(px1 + (vx1 - i) * t1);
-                var y = Math.Round(py1 + (vy1 - j) * t1);
-
-                /*
-                var mat2 = new Matrix(new double[,]
-                {
-                    { 1, t1 },
-                    { 1, t2 }
-                });
-
-                var det2 = mat2.Determinant;
-                if (det2 == 0)
-                    continue;
-
-                var ans2 = 1 / det2 * mat2.Adjugate * new Matrix(new double[,]
-                {
-                    { pz1 + vz1 * t1 },
-                    { pz2 + vz2 * t2 }
-                });
-
-                //var z = Math.Round(ans2[0, 0], MidpointRounding.AwayFromZero);
-                //var c = Math.Round(ans2[1, 0], MidpointRounding.AwayFromZero);
-
-                */
-
-                // simults solved algebraically
-                var k = Math.Round((pz2 + vz2 * t2 - pz1 - vz1 * t1) / (t2 - t1));
-                var z = Math.Round(pz1 + (vz1 - k) * t1);
-
-                (double px, double py, double pz, double vx, double vy, double vz) line = (x, y, z, i, j, k);
-
-                //
-                //if (hailstones.All(l => LinesIntersect2(ToArr(line), ToArr(l))))
-                if (hailstones.Where((l, x) => x != i && x != j).All(l => LinesIntersect(line, l)))
-                {
-                    return $"{line.px + line.py + line.pz}";
+                    return $"{x + y + z}";
                 }
             }
         }
@@ -192,29 +136,6 @@ public class Day24 : IDay
         return "Not found within estimated range";
     }
 
- 
-    static bool LinesIntersect((double px, double py, double pz, double vx, double vy, double vz) l1, (double px, double py, double pz, double vx, double vy, double vz) l2)
-    {
-        var ratio = l1.vx / l1.vy;
-        var denominator = l2.vx - l2.vy * ratio; 
-
-        if (denominator == 0) return true;
-
-        var t = (l1.px - l1.py * ratio + l2.py * ratio - l2.px) / denominator;
-        var k = (l2.px - l1.px + t * l2.vx) / l1.vx;
-
-        //return l1.pz + k * l1.vz == l2.pz + t * l2.vz;
-        return Equal(l1.pz + k * l1.vz, l2.pz + t * l2.vz);
-
-        // if (t < 0 || k < 0) return false;
-        //intersectionPoint = (X: l2.px + t * l2.vx, Y: l2.py + t * l2.vy, Z: l2.pz + t * l2.vz);
-
-    }
-
-    static double[] ToArr((double px, double py, double pz, double vx, double vy, double vz) data)
-        => new double[] {data.px, data.py, data.pz, data.vx, data.vy, data.vz};
-
-
-
-    static bool Equal(double a, double b) => Math.Abs(a - b) <= 0.000001;
+    static bool Intersect(long[] l1, long[] l2)
+        => (Enumerable.Range(0, 3).Where(i => (l2[i + 3] - l1[i + 3]) != 0).Select(i => (double)(l1[i] - l2[i]) / (l2[i + 3] - l1[i + 3])).Distinct().Count() == 1);
 }
