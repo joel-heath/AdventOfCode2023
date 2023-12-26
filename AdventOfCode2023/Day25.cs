@@ -19,36 +19,68 @@ public class Day25 : IDay
 
     };
 
-    public List<string> Dijkstras(string start, string end, Dictionary<string, List<string>> graph)
+    public List<List<string>> Dijkstras(string start, string end, Dictionary<string, List<string>> graph)
     {
-        Dictionary<string, string> visited = []; // node to the node it came from
-        Dictionary<string, (string source, int distance)> workingValues = new() { { start, (string.Empty, 0) } };
+        Dictionary<string, (List<string> sources, int distance)> visited = [];
+        List<(string node, string source, int distance)> workingValues = [(start, string.Empty, 0)];
 
         while (workingValues.Count > 0)
         {
-            var (node, (source, distance)) = workingValues.MinBy(x => x.Value);
-            workingValues.Remove(node);
-            visited.Add(node, source);
+            var (node, source, distance) = workingValues.MinBy(x => x.distance);
+            workingValues.Remove((node, source, distance));
+            if (visited.TryGetValue(node, out var details))
+            {
+                details.sources.Add(source);
+            }
+            else
+            {
+                visited.Add(node, ([source], distance));
+            }
+
             if (node == end) break;
 
-            foreach (var connection in graph[node].Where(n => !visited.ContainsKey(n)))
+            foreach (var connection in graph[node])
             {
-                if (!(workingValues.TryGetValue(node, out var tuple) && tuple.distance <= distance))
+                var newDistance = distance + 1;
+                var others = workingValues.Where(v => v.node == connection).ToArray();
+                if (others.Length >= 1)
                 {
-                    workingValues[connection] = (node, distance + 1);
+                    if (newDistance < others[0].distance)
+                    {
+                        foreach ((string n, string s, int d) in others)
+                        {
+                            workingValues.Remove((n, s, d));
+                        }
+                        workingValues.Add((connection, node, newDistance));
+                    }
+                    else if (newDistance == others[0].distance)
+                    {
+                        workingValues.Add((connection, node, newDistance));
+                    }
+                }
+                else
+                {
+                    workingValues.Add((connection, node, newDistance));
                 }
             }
         }
 
-        var curr = end;
-        List<string> path = [curr];
-        while (curr != start)
+        List<List<string>> paths = [[end]];
+        while (paths[0][0] != start)
         {
-            curr = visited[curr];
-            path.Add(curr);
+            List<List<string>> newPaths = [];
+            foreach (var path in paths)
+            {
+                foreach (var src in visited[path[0]].sources)
+                {
+                    newPaths.Add(path.Prepend(src).ToList());
+                }
+            }
+
+            paths = newPaths;
         }
 
-        return path;
+        return paths;
     }
 
     public IEnumerable<int> GetComponentSizes(Dictionary<string, List<string>> graph)
@@ -118,18 +150,20 @@ public class Day25 : IDay
         {
             foreach (var end in components.Where(i => i != start))
             {
-                foreach (var arc in Dijkstras(start, end, wires).ChunkInclusive(2))
+                foreach (var path in Dijkstras(start, end, wires))
                 {
-                    var nodes = arc.OrderBy(i => i).ToArray(); // need some sort of way to say arcs a -> b and b -> a are the same, only storing the alphebetically ordered arcs will suffice
-                    if (arcUsage.ContainsKey((nodes[0], nodes[1])))
+                    foreach (var arc in path.ChunkInclusive(2))
                     {
-                        arcUsage[(nodes[0], nodes[1])]++;
+                        var nodes = arc.OrderBy(i => i).ToArray(); // need some sort of way to say arcs a -> b and b -> a are the same, only storing the alphebetically ordered arcs will suffice
+                        if (arcUsage.ContainsKey((nodes[0], nodes[1])))
+                        {
+                            arcUsage[(nodes[0], nodes[1])]++;
+                        }
+                        else
+                        {
+                            arcUsage[(nodes[0], nodes[1])] = 1;
+                        }
                     }
-                    else
-                    {
-                        arcUsage[(nodes[0], nodes[1])] = 1;
-                    }
-
                 }
             }
         }
