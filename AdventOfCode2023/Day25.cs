@@ -19,68 +19,35 @@ public class Day25 : IDay
 
     };
 
-    public List<List<string>> Dijkstras(string start, string end, Dictionary<string, List<string>> graph)
+    public List<string> Dijkstras(string start, string end, Dictionary<string, List<string>> graph)
     {
-        Dictionary<string, (List<string> sources, int distance)> visited = [];
-        List<(string node, string source, int distance)> workingValues = [(start, string.Empty, 0)];
+        Dictionary<string, string> visited = []; // node to the node it came from
+        Queue<(string, string)> workingValues = new([(start, string.Empty)]);
 
-        while (workingValues.Count > 0)
+        while (workingValues.TryDequeue(out var stuff))
         {
-            var (node, source, distance) = workingValues.MinBy(x => x.distance);
-            workingValues.Remove((node, source, distance));
-            if (visited.TryGetValue(node, out var details))
-            {
-                details.sources.Add(source);
-            }
-            else
-            {
-                visited.Add(node, ([source], distance));
-            }
-
+            var (node, source) = stuff;
+            visited.Add(node, source);
             if (node == end) break;
 
-            foreach (var connection in graph[node])
+            foreach (var connection in graph[node].Where(n => !visited.ContainsKey(n)))
             {
-                var newDistance = distance + 1;
-                var others = workingValues.Where(v => v.node == connection).ToArray();
-                if (others.Length >= 1)
+                if (!workingValues.Any(v => v.Item1 == connection))
                 {
-                    if (newDistance < others[0].distance)
-                    {
-                        foreach ((string n, string s, int d) in others)
-                        {
-                            workingValues.Remove((n, s, d));
-                        }
-                        workingValues.Add((connection, node, newDistance));
-                    }
-                    else if (newDistance == others[0].distance)
-                    {
-                        workingValues.Add((connection, node, newDistance));
-                    }
-                }
-                else
-                {
-                    workingValues.Add((connection, node, newDistance));
+                    workingValues.Enqueue((connection, node));
                 }
             }
         }
 
-        List<List<string>> paths = [[end]];
-        while (paths[0][0] != start)
+        var curr = end;
+        List<string> path = [curr];
+        while (curr != start)
         {
-            List<List<string>> newPaths = [];
-            foreach (var path in paths)
-            {
-                foreach (var src in visited[path[0]].sources)
-                {
-                    newPaths.Add(path.Prepend(src).ToList());
-                }
-            }
-
-            paths = newPaths;
+            curr = visited[curr];
+            path.Add(curr);
         }
 
-        return paths;
+        return path;
     }
 
     public IEnumerable<int> GetComponentSizes(Dictionary<string, List<string>> graph)
@@ -118,8 +85,6 @@ public class Day25 : IDay
     {
         long total = 0;
 
-        var allNums = Utils.GetLongs(input).ToArray();
-
         HashSet<string> components = [];
         Dictionary<string, List<string>> wires = [];
 
@@ -145,30 +110,32 @@ public class Day25 : IDay
             wires[name] = arcList;
         }
 
+        var wirelist = components.ToList();
+
         Dictionary<(string, string), int> arcUsage = [];
-        foreach (var start in components)
+        for (int i = 0; i < 500; i++)
         {
-            foreach (var end in components.Where(i => i != start))
+            var start = wirelist[Random.Shared.Next(0, wirelist.Count)];
+            var end = wirelist[Random.Shared.Next(0, wirelist.Count)];
+
+            foreach (var arc in Dijkstras(start, end, wires).Window(2))
             {
-                foreach (var path in Dijkstras(start, end, wires))
+                var nodes = arc.OrderBy(i => i).ToArray(); // need some sort of way to say arcs a -> b and b -> a are the same, only storing the alphebetically ordered arcs will suffice
+                if (arcUsage.ContainsKey((nodes[0], nodes[1])))
                 {
-                    foreach (var arc in path.ChunkInclusive(2))
-                    {
-                        var nodes = arc.OrderBy(i => i).ToArray(); // need some sort of way to say arcs a -> b and b -> a are the same, only storing the alphebetically ordered arcs will suffice
-                        if (arcUsage.ContainsKey((nodes[0], nodes[1])))
-                        {
-                            arcUsage[(nodes[0], nodes[1])]++;
-                        }
-                        else
-                        {
-                            arcUsage[(nodes[0], nodes[1])] = 1;
-                        }
-                    }
+                    arcUsage[(nodes[0], nodes[1])]++;
                 }
+                else
+                {
+                    arcUsage[(nodes[0], nodes[1])] = 1;
+                }
+
             }
         }
 
         List<(string, string)> arcs = [.. arcUsage.OrderByDescending(a => a.Value).Select(x => x.Key)];
+
+        arcUsage.Dump();
 
         foreach (var cuts in arcs.Take(10).Combinations(3))
         {
@@ -191,11 +158,5 @@ public class Day25 : IDay
         return "Failed to find solution in estimated range";
     }
 
-    public string SolvePart2(string input)
-    {
-
-
-
-        return string.Empty;
-    }
+    public string SolvePart2(string input) => string.Empty;
 }
