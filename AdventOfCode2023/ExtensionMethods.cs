@@ -106,6 +106,41 @@ public static class ExtensionMethods
         return acc;
     }
 
+    /// <summary>
+    /// For managing two items at once, but inclusively, very similar to chunking
+    ///      Eg. Chunk: [0, 1, 2, 3]  =>  [[0, 1], [2, 3]]
+    /// ChunkInclusive: [0, 1, 2, 3]  =>  [[0, 1], [1, 2], [2, 3]]
+    /// </summary>
+    /// <typeparam name="T">Input source type</typeparam>
+    /// <param name="source">IEnumerable of elements to chunk inclusively</param>
+    /// <param name="chunkSize">Size of sub-arrays</param>
+    /// <returns></returns>
+    public static IEnumerable<T[]> ChunkInclusive<T>(this IEnumerable<T> source, int chunkSize)
+    {
+        var previousN = new T[chunkSize];
+        var enumerator = source.GetEnumerator();
+
+        int i = 0;
+
+        // populate with n items first before returning anything
+        for (; i < chunkSize; i++)
+        {
+            if (!enumerator.MoveNext()) throw new InvalidOperationException($"Not enough elements in source. Source only contained {i} item{(i == 1 ? "" : "s")} when {chunkSize} {(chunkSize == 1 ? "was" : "were")} required");
+            var curr = enumerator.Current;
+            previousN[i] = curr;
+        }
+
+        yield return previousN.ToArray();
+
+        i = 0;
+        while (enumerator.MoveNext())
+        {
+            previousN[i] = enumerator.Current;
+            i = (i + 1) % chunkSize;
+            yield return [.. previousN[i..], .. previousN[..i]];
+        }
+    }
+
     public static bool InvokeTruthfully(this Action action)
     {
         action.Invoke();

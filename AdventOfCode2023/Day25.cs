@@ -1,5 +1,3 @@
-using NEAConsole.Matrices;
-
 namespace AdventOfCode2023;
 public class Day25 : IDay
 {
@@ -21,146 +19,142 @@ public class Day25 : IDay
 
     };
 
+    public List<string> Dijkstras(string start, string end, Dictionary<string, List<string>> graph)
+    {
+        Dictionary<string, string> visited = []; // node to the node it came from
+        Dictionary<string, (string source, int distance)> workingValues = new() { { start, (string.Empty, 0) } };
+
+        while (workingValues.Count > 0)
+        {
+            var (node, (source, distance)) = workingValues.MinBy(x => x.Value);
+            workingValues.Remove(node);
+            visited.Add(node, source);
+            if (node == end) break;
+
+            foreach (var connection in graph[node].Where(n => !visited.ContainsKey(n)))
+            {
+                if (!(workingValues.TryGetValue(node, out var tuple) && tuple.distance <= distance))
+                {
+                    workingValues[connection] = (node, distance + 1);
+                }
+            }
+        }
+
+        var curr = end;
+        List<string> path = [curr];
+        while (curr != start)
+        {
+            curr = visited[curr];
+            path.Add(curr);
+        }
+
+        return path;
+    }
+
+    public IEnumerable<int> GetComponentSizes(Dictionary<string, List<string>> graph)
+    {
+        var subGraph = graph.ToDictionary();
+        Queue<string> toVisit = new([graph.First().Key]);
+
+        while (toVisit.TryDequeue(out var node))
+        {
+            subGraph.Remove(node);
+            foreach (var connection in graph[node].Where(n => subGraph.ContainsKey(n) && !toVisit.Contains(n)))
+            {
+                toVisit.Enqueue(connection);
+            }
+        }
+
+        var componentSize = graph.Count - subGraph.Count;
+        yield return componentSize;
+
+        if (subGraph.Count == 0)
+        {
+            yield break;
+        }
+
+        graph = subGraph;
+        subGraph = graph.ToDictionary();
+
+        foreach (var subgraph in GetComponentSizes(graph))
+        {
+            yield return subgraph;
+        }
+    }
+
     public string SolvePart1(string input)
     {
         long total = 0;
 
         var allNums = Utils.GetLongs(input).ToArray();
 
-        var (graphList, map) = Utils.GenerateGraph(input.Split(Environment.NewLine).SelectMany(line => line.Split(' ')[1..].Select(e => (line.Split(':')[0], e, 1))));
-        var (graphDirected, _) = Utils.GenerateGraph(input.Split(Environment.NewLine).SelectMany(line => line.Split(' ')[1..].Select(e => (line.Split(':')[0], e, 1))), true);
+        HashSet<string> components = [];
+        Dictionary<string, List<string>> wires = [];
 
-        //var graph = graphList.ToDictionary(i => i.name, i => i.edges);
-
-        //var adj = GetAdjacency(graphList);
-        //var mst = MatrixUtils.Prims(adj);
-
-        long max = 0;
-        // 14, 9
-
-
-        HashSet<int> sideOne = new();
-        HashSet<int> sideTwo = new();
-
-        Queue<int> remaining = new(Enumerable.Range(0, graphList.Count));
-
-        while (true)
+        foreach (var line in input.Split(Environment.NewLine))
         {
-            var a = remaining.Dequeue();
-            var b = remaining.Dequeue();
+            var sides = line.Split(": ");
+            var name = sides[0];
+            components.Add(name);
+            var connectedNodes = sides[1].Split(' ');
 
-            var aPoints = BFS(a, graphList);
-            var bPoints = BFS(b, graphList);
-            if (!aPoints.Intersect(bPoints).Any())
+            var arcList = wires.TryGetValue(name, out var oldArcs) ? oldArcs : [];
+
+            foreach (var node in connectedNodes) arcList.Add(node);
+
+            // graph is undirected, add the arc the other way round
+            foreach (var node in connectedNodes)
             {
-
+                var otherArcList = wires.TryGetValue(node, out var temp) ? temp : [];
+                otherArcList.Add(name);
+                wires[node] = otherArcList;
             }
-            
+
+            wires[name] = arcList;
         }
 
-
-        /*
-        for (int i = 0; i < graphDirected.Count; i++)
+        Dictionary<(string, string), int> arcUsage = [];
+        foreach (var start in components)
         {
-            foreach (var ei in graphDirected[i].edges.Keys)
+            foreach (var end in components.Where(i => i != start))
             {
-                var edgesFrom1 = graphList[i].edges;
-                var edgesTo1 = graphList[ei].edges;
-
-                edgesFrom1.Remove(ei);
-                edgesTo1.Remove(i);
-
-                for (int j = 0; j < graphDirected.Count; j++)
+                foreach (var arc in Dijkstras(start, end, wires).ChunkInclusive(2))
                 {
-
-                    foreach (var ej in graphDirected[j].edges.Keys)
+                    var nodes = arc.OrderBy(i => i).ToArray(); // need some sort of way to say arcs a -> b and b -> a are the same, only storing the alphebetically ordered arcs will suffice
+                    if (arcUsage.ContainsKey((nodes[0], nodes[1])))
                     {
-                        if (j == i && ei == ej) continue;
-
-                        var edgesFrom2 = graphList[j].edges;
-                        var edgesTo2 = graphList[ej].edges;
-
-                        edgesFrom2.Remove(ej);
-                        edgesTo2.Remove(j);
-
-                        for (int k = 0; k < graphDirected.Count; k++)
-                        {
-
-                            foreach (var ek in graphDirected[k].edges.Keys)
-                            {
-                                if (k == i && ei == ek || k == j && ej == ek) continue;
-
-                                var edgesFrom3 = graphList[k].edges;
-                                var edgesTo3 = graphList[ek].edges;
-                                
-                                edgesFrom3.Remove(ek);
-                                edgesTo3.Remove(k);
-
-                                var a = BFS(i, graphList);
-                                var b = BFS(ei, graphList);
-
-
-                                var ans = a * b;
-
-                                if (a + b == 15 && ans > max)
-                                {
-                                    max = ans;
-                                }
-
-                                edgesFrom3.Add(ek, 1);
-                                edgesTo3.Add(k, 1);
-                            }
-                        }
-
-                        edgesFrom2.Add(ej, 1);
-                        edgesTo2.Add(j, 1);
+                        arcUsage[(nodes[0], nodes[1])]++;
                     }
-                }
+                    else
+                    {
+                        arcUsage[(nodes[0], nodes[1])] = 1;
+                    }
 
-                edgesFrom1.Add(ei, 1);
-                edgesTo1.Add(i, 1);
-            }
-        }
-
-
-        return $"{max}";
-    }*/
-    }
-
-        private static HashSet<int> BFS(int start, List<(string name, Dictionary<int, int> edges)> graph)
-        {
-            HashSet<int> visited = [];
-            Queue<int> toVisit = new([start]);
-
-            long count = 0;
-            while (toVisit.TryDequeue(out int index))
-            {
-                var node = graph[index];
-                count++;
-                visited.Add(index);
-
-                foreach (var edge in node.edges.Keys.Where(e => !visited.Contains(e) && !toVisit.Contains(e)))
-                {
-                    toVisit.Enqueue(edge);
                 }
             }
-
-            return visited;
         }
 
-    private static Matrix GetAdjacency(List<(string name, Dictionary<int, int> edges)> graph)
-    {
-        Matrix m = new(graph.Count);
+        List<(string, string)> arcs = [.. arcUsage.OrderByDescending(a => a.Value).Select(x => x.Key)];
 
-        for (int i = 0; i < graph.Count; i++)
+        foreach (var cuts in arcs.Take(10).Combinations(3))
         {
-            foreach (var edge in graph[i].edges)
+            var newWires = wires.ToDictionary();
+
+            foreach (var cut in cuts)
             {
-                m[i, edge.Key] = edge.Value;
+                newWires[cut.Item1].Remove(cut.Item2);
+                newWires[cut.Item2].Remove(cut.Item1);
+            }
+
+            var componentSizes = GetComponentSizes(newWires).ToArray();
+
+            if (componentSizes.Length == 2)
+            {
+                return $"{componentSizes[0] * componentSizes[1]}";
             }
         }
 
-        return m;
+        return "Failed to find solution in estimated range";
     }
 
     public string SolvePart2(string input)
