@@ -1,31 +1,14 @@
-using AdventOfCode2023;
-using System;
-using System.Buffers;
-using System.Collections;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Numerics;
-using static System.Net.Mime.MediaTypeNames;
-
 namespace AdventOfCode2023;
 public class Day23 : IDay
 {
     public int Day => 23;
     public Dictionary<string, string> UnitTestsP1 => new()
     {
-        {
-            "#.#####################\r\n#.......#########...###\r\n#######.#########.#.###\r\n###.....#.>.>.###.#.###\r\n###v#####.#v#.###.#.###\r\n###.>...#.#.#.....#...#\r\n###v###.#.#.#########.#\r\n###...#.#.#.......#...#\r\n#####.#.#.#######.#.###\r\n#.....#.#.#.......#...#\r\n#.#####.#.#.#########v#\r\n#.#...#...#...###...>.#\r\n#.#.#v#######v###.###v#\r\n#...#.>.#...>.>.#.###.#\r\n#####v#.#.###v#.#.###.#\r\n#.....#...#...#.#.#...#\r\n#.#########.###.#.#.###\r\n#...###...#...#...#.###\r\n###.###.#.###v#####v###\r\n#...#...#.#.>.>.#.>.###\r\n#.###.###.#.###.#.#v###\r\n#.....###...###...#...#\r\n#####################.#",
-            "94"
-        },
-
+        { "#.#####################\r\n#.......#########...###\r\n#######.#########.#.###\r\n###.....#.>.>.###.#.###\r\n###v#####.#v#.###.#.###\r\n###.>...#.#.#.....#...#\r\n###v###.#.#.#########.#\r\n###...#.#.#.......#...#\r\n#####.#.#.#######.#.###\r\n#.....#.#.#.......#...#\r\n#.#####.#.#.#########v#\r\n#.#...#...#...###...>.#\r\n#.#.#v#######v###.###v#\r\n#...#.>.#...>.>.#.###.#\r\n#####v#.#.###v#.#.###.#\r\n#.....#...#...#.#.#...#\r\n#.#########.###.#.#.###\r\n#...###...#...#...#.###\r\n###.###.#.###v#####v###\r\n#...#...#.#.>.>.#.>.###\r\n#.###.###.#.###.#.#v###\r\n#.....###...###...#...#\r\n#####################.#", "94" }
     };
     public Dictionary<string, string> UnitTestsP2 => new()
     {
-        {
-            "#.#####################\r\n#.......#########...###\r\n#######.#########.#.###\r\n###.....#.>.>.###.#.###\r\n###v#####.#v#.###.#.###\r\n###.>...#.#.#.....#...#\r\n###v###.#.#.#########.#\r\n###...#.#.#.......#...#\r\n#####.#.#.#######.#.###\r\n#.....#.#.#.......#...#\r\n#.#####.#.#.#########v#\r\n#.#...#...#...###...>.#\r\n#.#.#v#######v###.###v#\r\n#...#.>.#...>.>.#.###.#\r\n#####v#.#.###v#.#.###.#\r\n#.....#...#...#.#.#...#\r\n#.#########.###.#.#.###\r\n#...###...#...#...#.###\r\n###.###.#.###v#####v###\r\n#...#...#.#.>.>.#.>.###\r\n#.###.###.#.###.#.#v###\r\n#.....###...###...#...#\r\n#####################.#",
-            "154"
-        },
-
+        { "#.#####################\r\n#.......#########...###\r\n#######.#########.#.###\r\n###.....#.>.>.###.#.###\r\n###v#####.#v#.###.#.###\r\n###.>...#.#.#.....#...#\r\n###v###.#.#.#########.#\r\n###...#.#.#.......#...#\r\n#####.#.#.#######.#.###\r\n#.....#.#.#.......#...#\r\n#.#####.#.#.#########v#\r\n#.#...#...#...###...>.#\r\n#.#.#v#######v###.###v#\r\n#...#.>.#...>.>.#.###.#\r\n#####v#.#.###v#.#.###.#\r\n#.....#...#...#.#.#...#\r\n#.#########.###.#.#.###\r\n#...###...#...#...#.###\r\n###.###.#.###v#####v###\r\n#...#...#.#.>.>.#.>.###\r\n#.###.###.#.###.#.#v###\r\n#.....###...###...#...#\r\n#####################.#", "154" }
     };
 
     public string SolvePart1(string input)
@@ -36,14 +19,11 @@ public class Day23 : IDay
         var start = (1, 0);
         var end = (map.Width - 2, map.Height - 1);
 
-
         return $"{Explore(map, start, end)}";
     }
 
-
     static long Explore(Grid<char> map, Point start, Point end)
     {
-
         long max = 0;
 
         var stack = new Stack<(Point pos, HashSet<Point> visited, long dist)>([(start, [], 0)]);
@@ -78,80 +58,10 @@ public class Day23 : IDay
 
         return max;
     }
-    /*
-    static long Explore2(Grid<char> map, Point start, Point end)
-    {
 
-        long max = 0;
-
-
-        var visited = new bool[map.Height, map.Width];
-        var stack = new Stack<(Point pos, long dist)>([(start, 0)]);
-        while (stack.TryPop(out var temp))
-        {
-            var (pos, dist) = temp;
-            var type = map[pos];
-            //var visitedStr = string.Join(';', visited.OrderBy(x => x.X).ThenBy(x => x.Y).Select(p => p.X.ToString() + ',' + p.Y.ToString()));
-
-            if (pos == end)
-            {
-                max = Math.Max(max, dist);
-                continue;
-            }
-            /*
-            foreach (var a in map.Adjacents(pos).Where(i => map[i] != '#'))
-            {
-                //a.Dump();
-                //Console.WriteLine(visited[a.Y][a.X]);
-            }
-
-            foreach (var des in map.Adjacents(pos).Where(des => map[des] != '#' && !visited[des.Y,des.X]).OrderBy(d => d.MDistanceTo((0, 0))))
-            {
-                visited[pos.Y, pos.X] = true;
-                stack.Push((des, dist + 1));
-                visited[pos.Y, pos.X] = false;
-            }
-
-            //memo.Add((pos, visitedStr));
-        }
-
-        return max;
-    }*/
-
-    static int reachedIn = 0;
-
-    static void Explore2(Grid<char> map, Point pos, Point end, bool[,] visited, int steps)
-    {
-        long max = 0;
-
-
-
-        var type = map[pos];
-
-        if (pos == end)
-        {
-            if (reachedIn >= steps) return;
-            Console.WriteLine("reached in " + steps);
-            reachedIn = Math.Max(reachedIn, steps);
-
-            return;
-        }
-
-        visited[pos.Y, pos.X] = true;
-        foreach (var des in map.Adjacents(pos).Where(des => map[des] != '#' && !visited[des.Y, des.X]).OrderBy(d => d.MDistanceTo((0, 0))))
-        {
-            Explore2(map, des, end, visited, steps + 1);
-        }
-        visited[pos.Y, pos.X] = false;
-
-        return;
-    }
-
-
-public string SolvePart2(string input)
+    public string SolvePart2(string input)
     {
         long total = 0;
-        //reachedIn = 0;
         string[] lines = input.Split(Environment.NewLine);
         Grid<char> map = new(lines.Length, lines[0].Length);
 
@@ -236,5 +146,4 @@ public string SolvePart2(string input)
 
         return distances;
     }
-
 }

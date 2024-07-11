@@ -4,22 +4,14 @@ public class Day25 : IDay
     public int Day => 25;
     public Dictionary<string, string> UnitTestsP1 => new()
     {
-        {
-            "jqt: rhn xhk nvd\r\nrsh: frs pzl lsr\r\nxhk: hfx\r\ncmg: qnr nvd lhk bvb\r\nrhn: xhk bvb hfx\r\nbvb: xhk hfx\r\npzl: lsr hfx nvd\r\nqnr: nvd\r\nntq: jqt hfx bvb xhk\r\nnvd: lhk\r\nlsr: lhk\r\nrzs: qnr cmg lsr rsh\r\nfrs: qnr lhk lsr",
-            "54"
-        },
-
+        { "jqt: rhn xhk nvd\r\nrsh: frs pzl lsr\r\nxhk: hfx\r\ncmg: qnr nvd lhk bvb\r\nrhn: xhk bvb hfx\r\nbvb: xhk hfx\r\npzl: lsr hfx nvd\r\nqnr: nvd\r\nntq: jqt hfx bvb xhk\r\nnvd: lhk\r\nlsr: lhk\r\nrzs: qnr cmg lsr rsh\r\nfrs: qnr lhk lsr", "54" }
     };
     public Dictionary<string, string> UnitTestsP2 => new()
     {
-        {
-            "TestInput1",
-            "ExpectedOutput1"
-        },
-
+        { "TestInput1", "" }
     };
 
-    public List<string> Dijkstras(string start, string end, Dictionary<string, List<string>> graph)
+    public List<string> FindPath(string start, string end, Dictionary<string, List<string>> graph)
     {
         Dictionary<string, string> visited = []; // node to the node it came from
         Queue<(string, string)> workingValues = new([(start, string.Empty)]);
@@ -118,7 +110,7 @@ public class Day25 : IDay
             var start = wirelist[Random.Shared.Next(0, wirelist.Count)];
             var end = wirelist[Random.Shared.Next(0, wirelist.Count)];
 
-            foreach (var arc in Dijkstras(start, end, wires).Window(2))
+            foreach (var arc in FindPath(start, end, wires).Window(2))
             {
                 var nodes = arc.OrderBy(i => i).ToArray(); // need some sort of way to say arcs a -> b and b -> a are the same, only storing the alphebetically ordered arcs will suffice
                 if (arcUsage.ContainsKey((nodes[0], nodes[1])))

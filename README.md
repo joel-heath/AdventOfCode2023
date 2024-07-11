@@ -11,7 +11,7 @@ Since any one-liner calling another one-liner recursive function could be reduce
 🟡 One-liner with other multiple one-liner methods & classes all of which only contain one-liner methods.<br>
 🟠 One-liner with some functions that are more than one-line long.<br>
 🔴 Far from a one-liner, with minimal amounts of code reduced.<br>
-⚫ Unattempted (probably because the problem isn't out yet, or I forgot to push).
+⚫ Unsolved (probably because the problem isn't out yet, or I forgot to push).
 
 | **Day** | **Verbosity** | **Notes** |
 |:---:|:---:|:---:|
@@ -36,7 +36,7 @@ Since any one-liner calling another one-liner recursive function could be reduce
 | [19](AdventOfCode2023/Day19.cs) | 🟡 | I gave in to OOP today & made a Workflow class with a discriminated union for the "if false" option. Solved part two by recursively counting options by refining ranges. |
 | [20](AdventOfCode2023/Day20.cs) | 🟡 | Similarly to yesterday I object-oriented today's solution, yet somehow I still managed to make every function a one-liner so only yellow for today. For my input, `rx`'s inputs were all conjunctions (and hence all needed to be 1s) so I found when all of `rx`'s inputs' inputs were 0s, and calculated their LCM. |
 | [21](AdventOfCode2023/Day21.cs) | 🟢 | I solved today's part two by noticing the empty "highways" on the starting position row, meaning you can directly get to a loop of the map, and massively reducing the problem. The map grows in a square so by finding the total number of reachable garden plots for 3 different numbers of repeats of the map, you can find the coefficients of a quadratic representing n repeats. Finally, since 26501365 = 131 * 202300 (grid size) + 65 (starting position), there are 131 repeats. |
-| [22](AdventOfCode2023/Day22.cs) | ⚫ |  |
-| [23](AdventOfCode2023/Day23.cs) | ⚫ |  |
-| [24](AdventOfCode2023/Day24.cs) | ⚫ |  |
-| [25](AdventOfCode2023/Day25.cs) | ⚫ |  |
+| [22](AdventOfCode2023/Day22.cs) | 🟢 | My method for today's was simply to find all that are able to fall. In part one I remove these from my list, in part two I add them to a list. Unfortunately though my part two takes about a minute to run. |
+| [23](AdventOfCode2023/Day23.cs) | 🔴 | Very disappointingly slow solution for part 2, mostly due to reaching stack overflows and having to create copies of sets as a result. |
+| [24](AdventOfCode2023/Day24.cs) | 🔴 | My part two is not deterministic, but I solved it by generating i and j components of the direction vector, then manually solving simultaneous equations for the i & j components of the position vector, and separately the k components of both vectors. I then test to see if it intersects all lines and if not try another. |
+| [25](AdventOfCode2023/Day25.cs) | 🔴 | Again, non-deterministic. I'm performing a BFS between 500 random pairs of nodes to find the most used arcs, then taking the top 10 of those and trying every combination of 3 of them until a cut is successfully made. |

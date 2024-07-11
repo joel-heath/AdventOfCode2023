@@ -4,25 +4,16 @@ public class Day24 : IDay
     public int Day => 24;
     public Dictionary<string, string> UnitTestsP1 => new()
     {
-        {
-            "19, 13, 30 @ -2,  1, -2\r\n18, 19, 22 @ -1, -1, -2\r\n20, 25, 34 @ -2, -2, -4\r\n12, 31, 28 @ -1, -2, -1\r\n20, 19, 15 @  1, -5, -3",
-            "2"
-        },
-
+        { "19, 13, 30 @ -2,  1, -2\r\n18, 19, 22 @ -1, -1, -2\r\n20, 25, 34 @ -2, -2, -4\r\n12, 31, 28 @ -1, -2, -1\r\n20, 19, 15 @  1, -5, -3", "2" }
     };
     public Dictionary<string, string> UnitTestsP2 => new()
     {
-        {
-            "19, 13, 30 @ -2,  1, -2\r\n18, 19, 22 @ -1, -1, -2\r\n20, 25, 34 @ -2, -2, -4\r\n12, 31, 28 @ -1, -2, -1\r\n20, 19, 15 @  1, -5, -3",
-            "47"
-        },
-
+        { "19, 13, 30 @ -2,  1, -2\r\n18, 19, 22 @ -1, -1, -2\r\n20, 25, 34 @ -2, -2, -4\r\n12, 31, 28 @ -1, -2, -1\r\n20, 19, 15 @  1, -5, -3", "47" }
     };
 
     public string SolvePart1(string input)
     {
         long total = 0;
-
 
         var allNums = Utils.GetLongs(input).ToArray();
         List<(double px, double py, double pz, double vx, double vy, double vz)> hailstones = new();
@@ -41,39 +32,12 @@ public class Day24 : IDay
         long count = 0;
         foreach (var combo in hailstones.Combinations(2).Select(c => c.ToList()))
         {
-            // combo[0].px + k * combo[0].vx = combo[1].px + t * combo[1].vx
-            // combo[0].py + k * combo[0].vy = combo[1].py + t * combo[1].vy
-
-            // x  -(1 / combo[0].vy)
-            // -combo[0].py / combo[0].vy - k * combo[0].vy / combo[0].vy = -combo[1].py / combo[0].vy + t * combo[1].vy / combo[0].vy
-
-            // x combo[0].vx
-            // -combo[0].py * combo[0].vx / combo[0].vy - k * combo[0].vx = -combo[1].py * combo[0].vx / combo[0].vy + t * combo[1].vy * combo[0].vx / combo[0].vy
-
-
-            // sum
-
-            // combo[0].px + k * combo[0].vx = combo[1].px + t * combo[1].vx
-            // -combo[0].py * combo[0].vx / combo[0].vy - k * combo[0].vx = -combo[1].py * combo[0].vx / combo[0].vy - t * combo[1].vy * combo[0].vx / combo[0].vy
-
-            // combo[0].px - combo[0].py * combo[0].vx / combo[0].vy  = combo[1].px - combo[1].py * combo[0].vx / combo[0].vy + t * (combo[1].vx - combo[1].vy * combo[0].vx / combo[0].vy)
-
-
-            // combo[0].px - combo[0].py * combo[0].vx / combo[0].vy + combo[1].py * combo[0].vx / combo[0].vy - combo[1].px = t * (combo[1].vx - combo[1].vy * combo[0].vx / combo[0].vy)
-
-            // t = (combo[0].px - combo[0].py * combo[0].vx / combo[0].vy + combo[1].py * combo[0].vx / combo[0].vy - combo[1].px) / (combo[1].vx - combo[1].vy * combo[0].vx / combo[0].vy)
-
-
             var ratio = combo[0].vx / combo[0].vy;
             var denominator = (combo[1].vx - combo[1].vy * ratio);
-
 
             if (denominator != 0)
             {
                 var t = (combo[0].px - combo[0].py * ratio + combo[1].py * ratio - combo[1].px) / denominator;
-
-                // k * combo[0].vx = combo[1].px - combo[0].px + t * combo[1].vx
-                //k = (combo[1].px - combo[0].px + t * combo[1].vx) / combo[0].vx
                 var k = (combo[1].px - combo[0].px + t * combo[1].vx) / combo[0].vx;
 
                 if (t > 0 && k > 0)
@@ -86,12 +50,6 @@ public class Day24 : IDay
                     }
 
                 }
-
-                /*
-                // check in final equation
-                
-
-                */
             }
         }
 
@@ -137,5 +95,5 @@ public class Day24 : IDay
     }
 
     static bool Intersect(long[] l1, long[] l2)
-        => (Enumerable.Range(0, 3).Where(i => (l2[i + 3] - l1[i + 3]) != 0).Select(i => (double)(l1[i] - l2[i]) / (l2[i + 3] - l1[i + 3])).Distinct().Count() == 1);
+        => Enumerable.Range(0, 3).Where(i => (l2[i + 3] - l1[i + 3]) != 0).Select(i => (double)(l1[i] - l2[i]) / (l2[i + 3] - l1[i + 3])).Distinct().Count() == 1;
 }
